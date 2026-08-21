@@ -1,1 +1,559 @@
 # Banco-sara
+<html style="margin:0;padding:0;">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script>
+(function(){
+  var s = document.createElement('style');
+  s.textContent = ':root{--bg:#faf9f4;--card:#ffffff;--text:#0f172a;--muted:#64748b;--accent:#c9923c;--accent-soft:rgba(201,146,60,.14);--accent2:#297a2e;--accent2-soft:rgba(41,122,46,.14);--accent3:#2563ab;--accent3-soft:rgba(37,99,171,.14);--border:rgba(15,23,42,.08)}*{box-sizing:border-box}.reveal{opacity:0;transform:translateY(20px);animation:fadeUp .6s ease forwards}@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}.stat-card{transition:transform .25s ease,box-shadow .25s ease}.stat-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.08)}.nav-item{transition:all .2s ease;cursor:pointer}.nav-item:hover,.nav-item.active{background:var(--accent-soft);color:var(--accent)}.list-row{transition:background .15s ease}.list-row:hover{background:rgba(128,128,128,.05)}.btn-primary{background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-weight:600;cursor:pointer;transition:all .2s ease;font-family:inherit}.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}.btn-secondary{background:var(--card);color:var(--text);border:1px solid var(--border);padding:10px 20px;border-radius:10px;font-weight:500;cursor:pointer;transition:all .2s ease;font-family:inherit}.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}.screen{display:none}.screen.active{display:block;animation:fadeIn .4s ease}@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}.modal-overlay.active{display:flex}.modal-box{background:var(--card);border-radius:16px;padding:28px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2)}.toast{position:fixed;top:20px;right:20px;padding:14px 22px;border-radius:12px;color:#fff;font-weight:500;z-index:2000;transform:translateX(120%);transition:transform .3s ease;box-shadow:0 8px 25px rgba(0,0,0,.15)}.toast.show{transform:translateX(0)}.toast.success{background:var(--accent2)}.toast.info{background:var(--accent3)}.coin-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:14px}.sidebar-link{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;color:var(--muted);font-size:14px;cursor:pointer;transition:all .2s ease;margin-bottom:4px}.sidebar-link:hover{background:rgba(128,128,128,.06);color:var(--text)}.sidebar-link.active{background:var(--accent-soft);color:var(--accent);font-weight:600}.tab-content{display:none}.tab-content.active{display:block}.profile-card{cursor:pointer;transition:all .3s ease;border:3px solid transparent}.profile-card:hover{transform:translateY(-5px);border-color:var(--accent-soft)}.profile-card.selected{border-color:var(--accent);background:var(--accent-soft)}';
+  document.head.appendChild(s);
+})();
+</script>
+<div style="background-color:transparent;box-sizing:border-box;">
+  <div style="color:var(--text);font-family:'Fredoka',sans-serif;background:var(--bg);min-height:600px;">
+
+    <!-- TOAST -->
+    <div id="toast" class="toast"></div>
+
+    <!-- TELA DE SELEÇÃO DE PERFIL (BETA - SEM LOGIN!) -->
+    <div id="screen-choose" class="screen active">
+      <div style="min-height:700px;display:flex;align-items:center;justify-content:center;padding:40px 20px;background:radial-gradient(800px 400px at 30% 0%, var(--accent-soft), transparent 60%),radial-gradient(600px 300px at 80% 100%, var(--accent2-soft), transparent 60%),var(--bg)">
+        <div class="reveal" style="width:100%;max-width:900px;text-align:center;">
+          
+          <!-- Logo -->
+          <div style="margin-bottom:40px;">
+            <div style="width:90px;height:90px;border-radius:24px;background:linear-gradient(135deg,var(--accent),#a07020);display:flex;align-items:center;justify-content:center;color:#fff;margin:0 auto 20px;box-shadow:0 12px 35px rgba(201,146,60,.3)">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10h6a2 2 0 0 1 0 4H9"/><path d="M9 14h5a2 2 0 0 1 0 4H8"/></svg>
+            </div>
+            <h1 class="text-4xl font-bold" style="color:var(--text);letter-spacing:-0.02em">Banco Sara</h1>
+            <p style="color:var(--muted);margin-top:10px;font-size:18px">Versão Beta 0.0.1 • Demonstração Rápida</p>
+            <span style="display:inline-block;margin-top:12px;padding:6px 16px;border-radius:20px;background:var(--accent-soft);color:var(--accent);font-weight:600;font-size:14px">🚀 Sem necessidade de login</span>
+          </div>
+
+          <!-- Cards de Seleção -->
+          <div class="grid gap-6" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-bottom:40px;">
+            
+            <div class="profile-card selected rounded-2xl p-8" style="background:var(--card);border:3px solid var(--accent3);box-shadow:0 8px 30px rgba(37,99,171,.15)" onclick="escolherPerfil('aluno')">
+              <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,var(--accent3),#1e40af);display:flex;align-items:center;justify-content:center;color:#fff;margin:0 auto 16px">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/></svg>
+              </div>
+              <h3 class="text-xl font-bold mb-2" style="color:var(--text)">🎓 Aluno</h3>
+              <p style="color:var(--muted);font-size:14px">Ver saldo e histórico de Saras</p>
+            </div>
+
+            <div class="profile-card rounded-2xl p-8" style="background:var(--card);border:3px solid var(--border)" onclick="escolherPerfil('professor')">
+              <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,var(--accent2),#1e5c22);display:flex;align-items:center;justify-content:center;color:#fff;margin:0 auto 16px">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              </div>
+              <h3 class="text-xl font-bold mb-2" style="color:var(--text)">📚 Professor</h3>
+              <p style="color:var(--muted);font-size:14px">Adicionar/remover Saras dos alunos</p>
+            </div>
+
+            <div class="profile-card rounded-2xl p-8" style="background:var(--card);border:3px solid var(--border)" onclick="escolherPerfil('colaborador')">
+              <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,var(--accent),#a07020);display:flex;align-items:center;justify-content:center;color:#fff;margin:0 auto 16px">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg>
+              </div>
+              <h3 class="text-xl font-bold mb-2" style="color:var(--text)">👑 Colaborador</h3>
+              <p style="color:var(--muted);font-size:14px">Ver gráficos e dados gerais</p>
+            </div>
+
+          </div>
+
+          <button class="btn-primary" style="padding:16px 48px;font-size:18px;border-radius:14px" onclick="entrarDemo()">
+            Entrar na Demonstração →
+          </button>
+
+          <p style="text-align:center;color:var(--muted);font-size:13px;margin-top:30px">
+            © 2026 Banco Sara • Versão Beta 0.0.1 • Para apresentação e demonstração
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TELA DO ALUNO (BETA) -->
+    <div id="screen-aluno" class="screen">
+      <div style="display:flex;flex-wrap:wrap;min-height:700px">
+        
+        <div style="width:240px;background:var(--card);border-right:1px solid var(--border);padding:20px;flex-shrink:0">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+            <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent3),#1e40af);display:flex;align-items:center;justify-content:center;color:#fff">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/></svg>
+            </div>
+            <div>
+              <p class="font-bold text-sm" style="color:var(--text)">Banco Sara</p>
+              <p class="text-xs" style="color:var(--muted)">🎓 Área do Aluno</p>
+            </div>
+          </div>
+          
+          <div class="sidebar-link active" onclick="alunoTab('saldo')" data-tab="saldo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10h6a2 2 0 0 1 0 4H9"/></svg>
+            Meu Saldo
+          </div>
+          <div class="sidebar-link" onclick="alunoTab('historico')" data-tab="historico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+            Histórico
+          </div>
+          
+          <div style="position:absolute;bottom:20px;width:200px">
+            <button class="btn-secondary" style="width:100%;font-size:13px" onclick="voltarInicio()">
+              ← Voltar
+            </button>
+          </div>
+        </div>
+
+        <div style="flex:1;min-width:300px;padding:32px;overflow-y:auto">
+          <div style="max-width:900px;margin:0 auto">
+            
+            <div id="aluno-tab-saldo" class="tab-content active">
+              <div style="margin-bottom:28px">
+                <p style="color:var(--muted);font-size:14px">Olá,</p>
+                <h1 class="text-3xl font-bold" style="color:var(--text)">Ana Clara 1</h1>
+                <p class="text-sm" style="color:var(--muted);margin-top:4px">Conta: 001 • 9º Ano A</p>
+              </div>
+
+              <div class="stat-card rounded-2xl p-8 mb-6" style="background:linear-gradient(135deg,var(--accent3),#1e40af);color:#fff;box-shadow:0 10px 40px rgba(37,99,171,.25)">
+                <p style="font-size:14px;opacity:.85;margin-bottom:8px">Meu Saldo em Saras</p>
+                <div style="display:flex;align-items:baseline;gap:10px">
+                  <span style="font-size:48px;font-weight:700;line-height:1" id="aluno-saldo">35</span>
+                  <span style="font-size:20px;opacity:.9">SARAS</span>
+                </div>
+                <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
+                  <div style="padding:8px 14px;border-radius:10px;background:rgba(255,255,255,.15);font-size:13px">
+                    📚 9º Ano A
+                  </div>
+                  <div style="padding:8px 14px;border-radius:10px;background:rgba(255,255,255,.15);font-size:13px">
+                    🎯 Ranking: 15º
+                  </div>
+                </div>
+              </div>
+
+              <div class="rounded-2xl p-6" style="background:var(--card);border:1px solid var(--border)">
+                <h3 class="font-bold mb-4" style="color:var(--text)">Últimas Movimentações</h3>
+                <div id="aluno-mov">
+                  <div class="list-row px-4 py-3" style="border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+                    <div style="display:flex;align-items:center;gap:12px">
+                      <div style="width:36px;height:36px;border-radius:10px;background:var(--accent2-soft);display:flex;align-items:center;justify-content:center;color:var(--accent2);font-weight:700;font-size:14px">+</div>
+                      <div>
+                        <p class="text-sm font-medium" style="color:var(--text)">Bom comportamento em sala</p>
+                        <p class="text-xs" style="color:var(--muted)">Prof. Carlos • 20/08</p>
+                      </div>
+                    </div>
+                    <span class="font-bold" style="color:var(--accent2)">+10</span>
+                  </div>
+                  <div class="list-row px-4 py-3" style="border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+                    <div style="display:flex;align-items:center;gap:12px">
+                      <div style="width:36px;height:36px;border-radius:10px;background:rgba(220,38,38,.08);display:flex;align-items:center;justify-content:center;color:#dc2626;font-weight:700;font-size:14px">-</div>
+                      <div>
+                        <p class="text-sm font-medium" style="color:var(--text)">Uso de celular em aula</p>
+                        <p class="text-xs" style="color:var(--muted)">Prof. Mariana • 19/08</p>
+                      </div>
+                    </div>
+                    <span class="font-bold" style="color:#dc2626">-5</span>
+                  </div>
+                  <div class="list-row px-4 py-3" style="display:flex;align-items:center;justify-content:space-between">
+                    <div style="display:flex;align-items:center;gap:12px">
+                      <div style="width:36px;height:36px;border-radius:10px;background:var(--accent2-soft);display:flex;align-items:center;justify-content:center;color:var(--accent2);font-weight:700;font-size:14px">+</div>
+                      <div>
+                        <p class="text-sm font-medium" style="color:var(--text)">Tarefa entregue no prazo</p>
+                        <p class="text-xs" style="color:var(--muted)">Prof. Carlos • 18/08</p>
+                      </div>
+                    </div>
+                    <span class="font-bold" style="color:var(--accent2)">+5</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="aluno-tab-historico" class="tab-content">
+              <h2 class="text-2xl font-bold mb-6" style="color:var(--text)">Histórico Completo</h2>
+              <div class="rounded-2xl overflow-hidden" style="border:1px solid var(--border);background:var(--card)">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr style="background:var(--bg);color:var(--muted)" class="text-xs uppercase">
+                      <th class="text-left px-5 py-3 font-medium">Data</th>
+                      <th class="text-left px-5 py-3 font-medium">Descrição</th>
+                      <th class="text-left px-5 py-3 font-medium">Professor</th>
+                      <th class="text-right px-5 py-3 font-medium">Valor</th>
+                    </tr>
+                  </thead>
+                  <tbody style="color:var(--text)">
+                    <tr class="list-row" style="border-bottom:1px solid var(--border)">
+                      <td class="px-5 py-3 text-xs" style="color:var(--muted)">20/08/2026</td>
+                      <td class="px-5 py-3">Bom comportamento em sala</td>
+                      <td class="px-5 py-3 text-xs" style="color:var(--muted)">Carlos Alberto Mendes</td>
+                      <td class="px-5 py-3 text-right font-bold" style="color:var(--accent2)">+10</td>
+                    </tr>
+                    <tr class="list-row" style="border-bottom:1px solid var(--border)">
+                      <td class="px-5 py-3 text-xs" style="color:var(--muted)">19/08/2026</td>
+                      <td class="px-5 py-3">Uso de celular em aula</td>
+                      <td class="px-5 py-3 text-xs" style="color:var(--muted)">Mariana Costa Silva</td>
+                      <td class="px-5 py-3 text-right font-bold" style="color:#dc2626">-5</td>
+                    </tr>
+                    <tr class="list-row" style="border-bottom:1px solid var(--border)">
+                      <td class="px-5 py-3 text-xs" style="color:var(--muted)">18/08/2026</td>
+                      <td class="px-5 py-3">Tarefa entregue no prazo</td>
+                      <td class="px-5 py-3 text-xs" style="color:var(--muted)">Carlos Alberto Mendes</td>
+                      <td class="px-5 py-3 text-right font-bold" style="color:var(--accent2)">+5</td>
+                    </tr>
+                    <tr class="list-row" style="border-bottom:1px solid var(--border)">
+                      <td class="px-5 py-3 text-xs" style="color:var(--muted)">17/08/2026</td>
+                      <td class="px-5 py-3">Participação na aula</td>
+                      <td class="px-5 py-3 text-xs" style="color:var(--muted)">Roberto Ferreira</td>
+                      <td class="px-5 py-3 text-right font-bold" style="color:var(--accent2)">+8</td>
+                    </tr>
+                    <tr class="list-row">
+                      <td class="px-5 py-3 text-xs" style="color:var(--muted)">15/08/2026</td>
+                      <td class="px-5 py-3">Boa nota na prova</td>
+                      <td class="px-5 py-3 text-xs" style="color:var(--muted)">Carlos Alberto Mendes</td>
+                      <td class="px-5 py-3 text-right font-bold" style="color:var(--accent2)">+17</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TELA DO PROFESSOR (BETA) -->
+    <div id="screen-professor" class="screen">
+      <div style="display:flex;flex-wrap:wrap;min-height:700px">
+        
+        <div style="width:240px;background:var(--card);border-right:1px solid var(--border);padding:20px;flex-shrink:0">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+            <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent2),#1e5c22);display:flex;align-items:center;justify-content:center;color:#fff">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </div>
+            <div>
+              <p class="font-bold text-sm" style="color:var(--text)">Banco Sara</p>
+              <p class="text-xs" style="color:var(--muted)">📚 Área do Professor</p>
+            </div>
+          </div>
+          
+          <div class="sidebar-link active" onclick="profTab('alunos')" data-tab-prof="alunos">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            Gerenciar Alunos
+          </div>
+          
+          <div style="margin-top:20px;padding:14px;border-radius:12px;background:var(--accent-soft)">
+            <p class="text-xs font-medium mb-1" style="color:var(--muted)">Total distribuído</p>
+            <p class="text-xl font-bold" style="color:var(--accent)">156</p>
+            <p class="text-xs" style="color:var(--muted)">Saras por mim</p>
+          </div>
+          
+          <div style="position:absolute;bottom:20px;width:200px">
+            <button class="btn-secondary" style="width:100%;font-size:13px" onclick="voltarInicio()">← Voltar</button>
+          </div>
+        </div>
+
+        <div style="flex:1;min-width:300px;padding:32px;overflow-y:auto">
+          <div style="max-width:1000px;margin:0 auto">
+            
+            <div id="prof-tab-alunos" class="tab-content active">
+              <div style="margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px">
+                <div>
+                  <p style="color:var(--muted);font-size:14px">Professor,</p>
+                  <h1 class="text-3xl font-bold" style="color:var(--text)">Carlos Alberto Mendes</h1>
+                  <p class="text-sm" style="color:var(--muted);margin-top:4px">Matemática</p>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap gap-4 mb-6">
+                <div class="stat-card rounded-xl p-4" style="flex:1 1 160px;background:var(--card);border:1px solid var(--border)">
+                  <p class="text-xs font-medium mb-1" style="color:var(--muted);text-transform:uppercase">Total Alunos</p>
+                  <p class="text-2xl font-bold" style="color:var(--text)">100</p>
+                </div>
+                <div class="stat-card rounded-xl p-4" style="flex:1 1 160px;background:var(--accent2-soft);border:1px solid var(--border)">
+                  <p class="text-xs font-medium mb-1" style="color:var(--muted);text-transform:uppercase">Saras em Circulação</p>
+                  <p class="text-2xl font-bold" style="color:var(--accent2)">2.450</p>
+                </div>
+                <div class="stat-card rounded-xl p-4" style="flex:1 1 160px;background:var(--accent-soft);border:1px solid var(--border)">
+                  <p class="text-xs font-medium mb-1" style="color:var(--muted);text-transform:uppercase">Média por Aluno</p>
+                  <p class="text-2xl font-bold" style="color:var(--accent)">24,5</p>
+                </div>
+              </div>
+
+              <div class="rounded-2xl overflow-hidden" style="border:1px solid var(--border);background:var(--card)">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr style="background:var(--bg);color:var(--muted)" class="text-xs uppercase">
+                      <th class="text-left px-5 py-3 font-medium">Conta</th>
+                      <th class="text-left px-5 py-3 font-medium">Aluno</th>
+                      <th class="text-left px-5 py-3 font-medium">Turma</th>
+                      <th class="text-right px-5 py-3 font-medium">Saldo (Saras)</th>
+                      <th class="text-center px-5 py-3 font-medium">Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody style="color:var(--text)">
+                    <tr class="list-row" style="border-bottom:1px solid var(--border)">
+                      <td class="px-5 py-3 font-mono text-xs" style="color:var(--muted)">001</td>
+                      <td class="px-5 py-3 font-medium">Ana Clara 1</td>
+                      <td class="px-5 py-3 text-xs" style="color:var(--muted)">9º Ano A</td>
+                      <td class="px-5 py-3 text-right font-bold" style="color:var(--accent)"><span id="demo-saldo-001">35</span></td>
+                      <td class="px-5 py-3 text-center">
+                        <button onclick="abrirModalDemo('001', 'Ana Clara 1')" style="padding:6px 14px;border-radius:8px;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">
+                          Lançar
+                        </button>
+                      </td>
+                    </tr>
+                    <tr class="list-row" style="border-bottom:1px solid var(--border)">
+                      <td class="px-5 py-3 font-mono text-xs" style="color:var(--muted)">002</td>
+                      <td class="px-5 py-3 font-medium">João Pedro 2</td>
+                      <td class="px-5 py-3 text-xs" style="color:var(--muted)">9º Ano A</td>
+                      <td class="px-5 py-3 text-right font-bold" style="color:var(--accent)">52</td>
+                      <td class="px-5 py-3 text-center">
+                        <button onclick="abrirModalDemo('002', 'João Pedro 2')" style="padding:6px 14px;border-radius:8px;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">
+                          Lançar
+                        </button>
+                      </td>
+                    </tr>
+                    <tr class="list-row" style="border-bottom:1px solid var(--border)">
+                      <td class="px-5 py-3 font-mono text-xs" style="color:var(--muted)">003</td>
+                      <td class="px-5 py-3 font-medium">Maria Fernanda 3</td>
+                      <td class="px-5 py-3 text-xs" style="color:var(--muted)">9º Ano B</td>
+                      <td class="px-5 py-3 text-right font-bold" style="color:var(--accent)">28</td>
+                      <td class="px-5 py-3 text-center">
+                        <button onclick="abrirModalDemo('003', 'Maria Fernanda 3')" style="padding:6px 14px;border-radius:8px;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">
+                          Lançar
+                        </button>
+                      </td>
+                    </tr>
+                    <tr class="list-row">
+                      <td class="px-5 py-3 font-mono text-xs" style="color:var(--muted)">004</td>
+                      <td class="px-5 py-3 font-medium">Pedro Henrique 4</td>
+                      <td class="px-5 py-3 text-xs" style="color:var(--muted)">8º Ano A</td>
+                      <td class="px-5 py-3 text-right font-bold" style="color:var(--accent)">41</td>
+                      <td class="px-5 py-3 text-center">
+                        <button onclick="abrirModalDemo('004', 'Pedro Henrique 4')" style="padding:6px 14px;border-radius:8px;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">
+                          Lançar
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TELA DO COLABORADOR (BETA) -->
+    <div id="screen-colaborador" class="screen">
+      <div style="display:flex;flex-wrap:wrap;min-height:700px">
+        
+        <div style="width:240px;background:var(--card);border-right:1px solid var(--border);padding:20px;flex-shrink:0">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+            <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#a07020);display:flex;align-items:center;justify-content:center;color:#fff">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg>
+            </div>
+            <div>
+              <p class="font-bold text-sm" style="color:var(--text)">Banco Sara</p>
+              <p class="text-xs" style="color:var(--muted)">👑 Área do Colaborador</p>
+            </div>
+          </div>
+          
+          <div class="sidebar-link active" onclick="colabTab('dashboard')" data-tab-colab="dashboard">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard Geral
+          </div>
+          
+          <div style="position:absolute;bottom:20px;width:200px">
+            <button class="btn-secondary" style="width:100%;font-size:13px" onclick="voltarInicio()">← Voltar</button>
+          </div>
+        </div>
+
+        <div style="flex:1;min-width:300px;padding:32px;overflow-y:auto">
+          <div style="max-width:1100px;margin:0 auto">
+            
+            <div id="colab-tab-dashboard" class="tab-content active">
+              <div style="margin-bottom:28px">
+                <p style="color:var(--muted);font-size:14px">Colaborador,</p>
+                <h1 class="text-3xl font-bold" style="color:var(--text)">Marcelo Henrique</h1>
+                <p class="text-sm" style="color:var(--muted);margin-top:4px">Diretor de Projetos</p>
+              </div>
+
+              <div class="flex flex-wrap gap-4 mb-8">
+                <div class="stat-card rounded-2xl p-6" style="flex:1 1 200px;background:linear-gradient(135deg,var(--accent),#a07020);color:#fff;box-shadow:0 8px 25px rgba(201,146,60,.25)">
+                  <p style="font-size:13px;opacity:.85;margin-bottom:6px">💰 Total de Saras na Escola</p>
+                  <p style="font-size:36px;font-weight:700;line-height:1">2.450</p>
+                  <p style="font-size:12px;opacity:.8;margin-top:6px">Soma de todas as contas</p>
+                </div>
+                <div class="stat-card rounded-2xl p-6" style="flex:1 1 200px;background:var(--card);border:1px solid var(--border)">
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;font-weight:500">🎓 Alunos Ativos</p>
+                  <p style="font-size:36px;font-weight:700;line-height:1;color:var(--text)">100</p>
+                  <p style="font-size:12px;color:var(--muted);margin-top:6px">Com conta cadastrada</p>
+                </div>
+                <div class="stat-card rounded-2xl p-6" style="flex:1 1 200px;background:var(--card);border:1px solid var(--border)">
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;font-weight:500">📚 Professores</p>
+                  <p style="font-size:36px;font-weight:700;line-height:1;color:var(--accent2)">5</p>
+                  <p style="font-size:12px;color:var(--muted);margin-top:6px">Ativos no sistema</p>
+                </div>
+                <div class="stat-card rounded-2xl p-6" style="flex:1 1 200px;background:var(--card);border:1px solid var(--border)">
+                  <p style="font-size:13px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;font-weight:500">📊 Média Geral</p>
+                  <p style="font-size:36px;font-weight:700;line-height:1;color:var(--accent3)">24,5</p>
+                  <p style="font-size:12px;color:var(--muted);margin-top:6px">Saras por aluno</p>
+                </div>
+              </div>
+
+              <div class="grid gap-6 mb-6" style="grid-template-columns:repeat(auto-fit,minmax(400px,1fr))">
+                <div class="rounded-2xl p-6" style="background:var(--card);border:1px solid var(--border)">
+                  <h3 class="font-bold mb-4" style="color:var(--text)">📈 Saras Distribuídos por Dia</h3>
+                  <div id="chart-dias" style="height:300px;width:100%"></div>
+                </div>
+                <div class="rounded-2xl p-6" style="background:var(--card);border:1px solid var(--border)">
+                  <h3 class="font-bold mb-4" style="color:var(--text)">🏆 Top 5 Alunos com Mais Saras</h3>
+                  <div id="chart-top5" style="height:300px;width:100%"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL DE LANÇAMENTO (DEMO) -->
+    <div id="modal-lancamento" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+      <div class="modal-box">
+        <h3 class="text-xl font-bold mb-1" style="color:var(--text)">Lançar Saras</h3>
+        <p class="text-sm mb-5" style="color:var(--muted)">Aluno(a): <strong id="modal-aluno-nome" style="color:var(--text)">—</strong></p>
+        
+        <div style="margin-bottom:14px">
+          <label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px;color:var(--text)">Tipo de operação</label>
+          <div style="display:flex;gap:8px">
+            <button id="btn-add" onclick="setOperacao('add')" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--accent2);background:var(--accent2-soft);color:var(--accent2);font-weight:600;cursor:pointer;font-family:inherit">
+              ✅ Adicionar
+            </button>
+            <button id="btn-rem" onclick="setOperacao('rem')" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:transparent;color:var(--muted);font-weight:500;cursor:pointer;font-family:inherit">
+              ⚠️ Remover
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-bottom:14px">
+          <label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px;color:var(--text)">Quantidade de Saras</label>
+          <input type="number" id="modal-valor" class="input-field" min="1" value="5" placeholder="Ex: 10">
+        </div>
+
+        <div style="margin-bottom:20px">
+          <label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px;color:var(--text)">Motivo</label>
+          <select id="modal-motivo" class="input-field">
+            <option value="Bom comportamento em sala">Bom comportamento em sala</option>
+            <option value="Tarefa entregue no prazo">Tarefa entregue no prazo</option>
+            <option value="Participação na aula">Participação na aula</option>
+            <option value="Boa nota na prova">Boa nota na prova</option>
+            <option value="Uso de celular em aula">Uso de celular em aula</option>
+            <option value="Atraso">Atraso</option>
+          </select>
+        </div>
+
+        <div style="display:flex;gap:10px">
+          <button class="btn-secondary" style="flex:1" onclick="closeModal()">Cancelar</button>
+          <button class="btn-primary" style="flex:1" onclick="confirmarLancamentoDemo()">Confirmar</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ==========================================
+// BANCO SARA - VERSÃO BETA 0.0.1 (DEMONSTRAÇÃO)
+// ==========================================
+
+let perfilSelecionado = 'aluno';
+let operacaoAtual = 'add';
+let saldoDemo = 35;
+
+// Seleção de perfil
+function escolherPerfil(p){
+  perfilSelecionado = p;
+  document.querySelectorAll('.profile-card').forEach(card=>{
+    if(card.onclick.toString().includes("'"+p+"'")){
+      card.classList.add('selected');
+      card.style.borderColor = p==='aluno'?'var(--accent3)':p==='professor'?'var(--accent2)':'var(--accent)';
+    }else{
+      card.classList.remove('selected');
+      card.style.borderColor = 'var(--border)';
+    }
+  });
+}
+
+function entrarDemo(){
+  document.getElementById('screen-choose').classList.remove('active');
+  if(perfilSelecionado==='aluno'){
+    document.getElementById('screen-aluno').classList.add('active');
+  }else if(perfilSelecionado==='professor'){
+    document.getElementById('screen-professor').classList.add('active');
+  }else if(perfilSelecionado==='colaborador'){
+    document.getElementById('screen-colaborador').classList.add('active');
+    setTimeout(carregarGraficosDemo, 200);
+  }
+  showToast('Bem-vindo! Demonstração carregada ✅','success');
+}
+
+function voltarInicio(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-choose').classList.add('active');
+}
+
+// Navegação Aluno
+function alunoTab(tab){
+  document.querySelectorAll('#screen-aluno .sidebar-link').forEach(l=>{
+    l.classList.toggle('active', l.dataset.tab===tab);
+  });
+  document.querySelectorAll('#screen-aluno .tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('aluno-tab-'+tab).classList.add('active');
+}
+
+// Navegação Professor
+function profTab(tab){
+  document.querySelectorAll('#screen-professor .sidebar-link').forEach(l=>{
+    l.classList.toggle('active', l.dataset.tabProf===tab);
+  });
+  document.querySelectorAll('#screen-professor .tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('prof-tab-'+tab).classList.add('active');
+}
+
+// Navegação Colaborador
+function colabTab(tab){
+  document.querySelectorAll('#screen-colaborador .sidebar-link').forEach(l=>{
+    l.classList.toggle('active', l.dataset.tabColab===tab);
+  });
+  document.querySelectorAll('#screen-colaborador .tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('colab-tab-'+tab).classList.add('active');
+}
+
+// Modal Demo
+function abrirModalDemo(conta, nome){
+  document.getElementById('modal-aluno-nome').textContent = nome;
+  document.getElementById('modal-lancamento').classList.add('active');
+}
+
+function closeModal(){
+  document.getElementById('modal-lancamento').classList.remove('active');
+}
+
+function setOperacao(op){
+  operacaoAtual = op;
+  const btnAdd = document.getElementById('btn-add');
+  const btnRem = document.getElementById('btn-rem');
+  if(op==='add'){
+    btnAdd.style.background='var(--accent2-soft)';
+    btnAdd.style.borderColor='var(--accent2)';
+    btnAdd.style.color='var(--accent2)';
+    btnRem.style.background='transparent';
+    btnRem.style.borderColor='var(--border)';
+    btnRem.style.color='var(--muted)';
+  }else{
+    btnRem.style.background='rgba(220,38,38,.1)';
+    btnRem.style.borderColor='#dc2626';
+    btnRem.style.color='#dc2626';
+    btnAdd.style.background='transparent';
+    btnAdd.style
