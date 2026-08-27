@@ -351,8 +351,8 @@ body{background:var(--bg);color:var(--text);min-height:100vh}
 // ============================================================
 // 👇 COLE SUA URL E CHAVE DO SUPABASE AQUI 👇
 // ============================================================
-const SUPABASE_URL = "https://SEU-PROJETO.supabase.co";
-const SUPABASE_KEY = "SUA-CHAVE-ANON-PUBLICA";
+const SUPABASE_URL = "https://riizbppmwhkntotukbga.supabase.co/rest/v1/";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpaXpicHBtd2hrbnRvdHVrYmdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MjkzNjcsImV4cCI6MjEwMzMwNTM2N30.3ATHYOmxFcujbKoAAgezzMBL9qr7JKY_49gXevHAh58;
 // ============================================================
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
