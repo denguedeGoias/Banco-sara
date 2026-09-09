@@ -3,996 +3,838 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Banco Sara — Beta 0.0.2</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Banco Sara · Beta 0.0.2</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.js"></script>
-<script>
-// ===================== COLOQUE SUAS CHAVES AQUI =====================
-const SUPABASE_URL = https://riizbppmwhkntotukbga.supabase.co/
-const SUPABASE_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpaXpicHBtd2hrbnRvdHVrYmdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MjkzNjcsImV4cCI6MjEwMzMwNTM2N30.3ATHYOmxFcujbKoAAgezzMBL9qr7JKY_49gXevHAh58
-// ====================================================================
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-</script>
 <style>
 :root{
-  --bg:#1a1d2e;--card:#24283d;--text:#eef1f8;--muted:#8a98b8;
-  --accent:#d4a24a;--accent-soft:rgba(212,162,74,.14);
-  --accent2:#4e9c88;--accent2-soft:rgba(78,156,136,.14);
-  --danger:#c24a68;--danger-soft:rgba(194,74,104,.14);
-  --border:rgba(138,152,184,.15);
+  --preto:#0F1115;
+  --preto-claro:#1A1D23;
+  --cinza:#2A2E37;
+  --dourado:#D4AF37;
+  --dourado-claro:#F0D76C;
+  --dourado-escuro:#B8960C;
+  --texto:#FFFFFF;
+  --texto-claro:#B0B3B8;
+  --erro:#E53935;
+  --sucesso:#4CAF50;
 }
-*{font-family:"Source Sans 3",sans-serif;margin:0;padding:0;box-sizing:border-box}
-h1,h2,h3,h4,.serif{font-family:"Cormorant Garamond",serif}
-body{background:var(--bg);color:var(--text);min-height:100vh}
-.reveal{opacity:0;transform:translateY(16px);animation:fadeUp .5s ease forwards}
-.reveal:nth-child(2){animation-delay:.08s}.reveal:nth-child(3){animation-delay:.16s}
-.reveal:nth-child(4){animation-delay:.24s}.reveal:nth-child(5){animation-delay:.32s}
-@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
-.card-hover{transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
-.card-hover:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 12px 40px rgba(212,162,74,.1)}
-.nav-item{transition:all .15s ease;cursor:pointer}
-.nav-item:hover{background:var(--accent-soft);color:var(--accent)}
-.nav-item.active{background:var(--accent-soft);color:var(--accent);border-left:3px solid var(--accent)}
-.btn-primary{background:var(--accent);color:#1a1d2e;font-weight:700;transition:all .15s ease;border:none;cursor:pointer;border-radius:10px}
-.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
-.btn-secondary{background:var(--card);border:1px solid var(--border);color:var(--text);transition:all .15s ease;cursor:pointer;border-radius:10px}
-.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
-.btn-success{background:var(--accent2);color:#fff;font-weight:600;transition:all .15s ease;border:none;cursor:pointer;border-radius:10px}
-.btn-success:hover{filter:brightness(1.1)}
-.btn-danger{background:var(--danger);color:#fff;font-weight:600;transition:all .15s ease;border:none;cursor:pointer;border-radius:10px}
-.btn-danger:hover{filter:brightness(1.1)}
-.input-field{background:var(--bg);border:1px solid var(--border);color:var(--text);transition:border-color .15s ease;border-radius:10px;padding:14px 16px;font-size:14px;width:100%}
-.input-field:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(212,162,74,.1)}
-.admin-badge{background:var(--accent2-soft);color:var(--accent2);border:1px solid var(--accent2);padding:3px 10px;border-radius:14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em}
-.student-row{transition:all .2s ease;border-radius:12px}
-.student-row:hover{background:var(--bg)}
-.hidden{display:none!important}
-.flex{display:flex}.flex-col{flex-direction:column}.flex-1{flex:1}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:8px}.gap-3{gap:12px}.gap-4{gap:16px}.gap-6{gap:24px}
-.grid{display:grid}.grid-cols-1{grid-template-columns:repeat(1,1fr)}.grid-cols-2{grid-template-columns:repeat(2,1fr)}.grid-cols-3{grid-template-columns:repeat(3,1fr)}.grid-cols-4{grid-template-columns:repeat(4,1fr)}
-.w-full{width:100%}.max-w-md{max-width:448px}.max-w-6xl{max-width:1152px}
-.mx-auto{margin-left:auto;margin-right:auto}
-.mb-1{margin-bottom:4px}.mb-2{margin-bottom:8px}.mb-3{margin-bottom:12px}.mb-4{margin-bottom:16px}.mb-6{margin-bottom:24px}.mb-8{margin-bottom:32px}.mt-1{margin-top:4px}.mt-2{margin-top:8px}.mt-4{margin-top:16px}
-.p-3{padding:12px}.p-4{padding:16px}.p-5{padding:20px}.p-6{padding:24px}.p-8{padding:32px}.px-4{padding-left:16px;padding-right:16px}.py-2{padding-top:8px;padding-bottom:8px}.py-3{padding-top:12px;padding-bottom:12px}.py-12{padding-top:48px;padding-bottom:48px}
-.rounded-lg{border-radius:8px}.rounded-xl{border-radius:12px}.rounded-2xl{border-radius:16px}.rounded-full{border-radius:9999px}
-.text-center{text-align:center}.text-right{text-align:right}
-.text-xs{font-size:12px}.text-sm{font-size:14px}.text-base{font-size:16px}.text-lg{font-size:18px}.text-xl{font-size:20px}.text-2xl{font-size:24px}.text-3xl{font-size:30px}.text-4xl{font-size:36px}.text-5xl{font-size:48px}
-.font-bold{font-weight:700}.font-semibold{font-weight:600}.font-medium{font-weight:500}
-.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.opacity-70{opacity:.7}.opacity-80{opacity:.8}
-.min-h-screen{min-height:100vh}
-.w-64{width:256px}
-.sticky{position:sticky}.top-0{top:0}
-.z-10{z-index:10}.z-50{z-index:50}
-.bg-card{background:var(--card)}.bg-bg{background:var(--bg)}
-.border{border-width:1px}.border-default{border-color:var(--border)}
-.divide-y > * + *{border-top:1px solid var(--border)}
-.cursor-pointer{cursor:pointer}
-.overflow-hidden{overflow:hidden}
-.shadow-soft{box-shadow:0 4px 20px rgba(0,0,0,.15)}
-.balance-gradient{background:linear-gradient(135deg,var(--accent) 0%,#b8862f 100%);color:#1a1d2e}
-.toast{position:fixed;top:20px;right:20px;padding:14px 20px;border-radius:12px;font-weight:600;font-size:14px;z-index:100;animation:slideIn .3s ease;box-shadow:0 8px 30px rgba(0,0,0,.3)}
-.toast.success{background:var(--accent2);color:#fff}.toast.error{background:var(--danger);color:#fff}.toast.info{background:var(--accent);color:#1a1d2e}
-@keyframes slideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
-.modal{background:var(--card);border-radius:16px;padding:24px;width:100%;max-width:420px;border:1px solid var(--border)}
-.sync-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--accent2-soft);color:var(--accent2);border:1px solid var(--accent2)}
-.sync-badge.off{background:rgba(138,152,184,.1);color:var(--muted);border-color:var(--border)}
-@media(min-width:768px){
-  .md\:flex{display:flex}.md\:hidden{display:none}
-  .md\:grid-cols-2{grid-template-columns:repeat(2,1fr)}.md\:grid-cols-3{grid-template-columns:repeat(3,1fr)}
-  .md\:gap-4{gap:16px}.md\:gap-6{gap:24px}
-  .md\:p-6{padding:24px}.md\:p-8{padding:32px}.md\:px-8{padding-left:32px;padding-right:32px}
-  .md\:text-3xl{font-size:30px}.md\:text-4xl{font-size:36px}.md\:text-5xl{font-size:48px}
-  .md\:flex-col{flex-direction:column}
-  .lg\:col-span-2{grid-column:span 2/span 2}
-  .lg\:grid-cols-3{grid-template-columns:repeat(3,1fr)}
-}
-@media(max-width:767px){
-  .pb-24{padding-bottom:96px}
-  .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:10px 0;z-index:20}
-  .bottom-nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 14px;border-radius:10px;font-size:10px;color:var(--muted);cursor:pointer;transition:all .15s}
-  .bottom-nav-item.active,.bottom-nav-item:hover{color:var(--accent);background:var(--accent-soft)}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;}
+body{background:var(--preto);color:var(--texto);min-height:100vh;}
+
+/* TELAS */
+.tela{display:none;min-height:100vh;}
+.tela.ativa{display:block;}
+
+/* CONTAINER CENTRAL */
+.container{max-width:440px;margin:0 auto;padding:20px;}
+.container-grande{max-width:900px;margin:0 auto;padding:20px;}
+
+/* CARD LOGIN */
+.card-login{background:var(--preto-claro);border:1px solid var(--cinza);border-radius:20px;padding:40px 30px;margin-top:40px;box-shadow:0 10px 40px rgba(0,0,0,0.5);}
+.logo{text-align:center;margin-bottom:30px;}
+.logo-icon{width:72px;height:72px;background:linear-gradient(135deg,var(--dourado),var(--dourado-escuro));border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.logo-icon svg{width:36px;height:36px;fill:var(--preto);}
+.logo h1{font-size:34px;font-weight:700;color:var(--dourado);letter-spacing:3px;}
+.logo p{color:var(--texto-claro);font-size:14px;margin-top:6px;}
+
+/* INPUTS */
+.grupo-input{margin-bottom:16px;}
+label{display:block;font-size:14px;color:var(--texto-claro);margin-bottom:8px;}
+input, select{width:100%;padding:12px 14px;background:var(--cinza);border:1px solid transparent;border-radius:10px;color:var(--texto);font-size:15px;outline:none;transition:all 0.2s;}
+input:focus, select:focus{border-color:var(--dourado);box-shadow:0 0 0 2px rgba(212,175,55,0.15);}
+input::placeholder{color:#6B6F76;}
+
+/* BOTÕES */
+.btn{padding:12px 16px;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn-principal{background:linear-gradient(90deg,var(--dourado),var(--dourado-claro));color:var(--preto);width:100%;}
+.btn-principal:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(212,175,55,0.25);}
+btn-principal:active{transform:translateY(0);}
+btn-sair{background:transparent;color:var(--texto-claro);border:1px solid var(--cinza);margin-top:20px;}
+.btn-sair:hover{border-color:var(--erro);color:var(--erro);}
+.btn-adicionar{background:var(--sucesso);color:white;}
+.btn-remover{background:var(--erro);color:white;}
+btn-editar{background:var(--dourado);color:var(--preto);}
+.btn-acao{padding:7px 12px;font-size:13px;width:auto;margin:0 3px;}
+.btn-icone{background:transparent;border:none;color:var(--texto-claro);padding:4px 8px;cursor:pointer;border-radius:6px;}
+.btn-icone:hover{background:var(--cinza);color:var(--dourado);}
+
+/* MENSAGEM */
+.msg{margin-top:14px;padding:12px;border-radius:8px;text-align:center;font-size:14px;display:none;}
+.msg.erro{background:rgba(229,57,53,0.1);color:#EF5350;display:block;}
+.msg.sucesso{background:rgba(76,175,80,0.1);color:#66BB6A;display:block;}
+
+/* CABEÇALHO PAINEL */
+.cabecalho{display:flex;justify-content:space-between;align-items:center;padding:20px 0;margin-bottom:24px;border-bottom:1px solid var(--cinza);flex-wrap:wrap;gap:12px;}
+.cabecalho .esquerdo{display:flex;align-items:center;gap:14px;}
+.avatar{width:44px;height:44px;background:linear-gradient(135deg,var(--dourado),var(--dourado-escuro));border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--preto);font-weight:700;font-size:18px;}
+h2{font-size:20px;color:var(--dourado);}
+.cargo{font-size:12px;background:var(--cinza);color:var(--dourado-claro);padding:3px 10px;border-radius:12px;margin-left:8px;}
+
+/* CARTÃO SALDO */
+.cartao-saldo{background:linear-gradient(135deg,var(--dourado-escuro),var(--dourado));border-radius:16px;padding:28px;color:var(--preto);margin-bottom:24px;}
+.cartao-saldo p{font-size:14px;opacity:0.85;}
+.cartao-saldo .valor{font-size:40px;font-weight:700;margin:6px 0;}
+
+/* CARD LISTA */
+.card{background:var(--preto-claro);border:1px solid var(--cinza);border-radius:14px;padding:20px;margin-bottom:16px;}
+.card h3{font-size:16px;margin-bottom:16px;color:var(--dourado-claro);display:flex;justify-content:space-between;align-items:center;}
+
+/* TABELA E ITENS */
+.linha{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--cinza);flex-wrap:wrap;gap:8px;}
+.linha:last-child{border-bottom:none;}
+.nome-aluno{font-weight:500;}
+.info-aluno{font-size:13px;color:var(--texto-claro);margin-top:2px;}
+.valor-positivo{color:#66BB6A;font-weight:600;}
+.valor-negativo{color:#EF5350;font-weight:600;}
+
+/* ABAS */
+.abas{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.aba{background:var(--cinza);color:var(--texto-claro);border:none;padding:10px 16px;border-radius:8px;cursor:pointer;font-size:14px;transition:all 0.2s;}
+.aba.ativa{background:var(--dourado);color:var(--preto);font-weight:600;}
+.conteudo-aba{display:none;}
+.conteudo-aba.ativo{display:block;}
+
+/* MODAL */
+.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;padding:20px;z-index:1000;}
+.overlay.ativo{display:flex;}
+.modal{background:var(--preto-claro);border:1px solid var(--dourado);border-radius:16px;padding:24px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;}
+.modal h3{color:var(--dourado);margin-bottom:6px;}
+.modal p{color:var(--texto-claro);font-size:14px;margin-bottom:20px;}
+.botoes-modal{display:flex;gap:10px;margin-top:20px;}
+.btn-cancelar{background:var(--cinza);color:var(--texto);flex:1;}
+.btn-confirmar{background:var(--dourado);color:var(--preto);flex:1;}
+
+/* RESUMO CARDS */
+.grid-resumo{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px;}
+.card-resumo{background:var(--preto-claro);border:1px solid var(--cinza);border-radius:12px;padding:16px;}
+.card-resumo .titulo{font-size:12px;color:var(--texto-claro);margin-bottom:6px;}
+.card-resumo .valor{font-size:24px;font-weight:700;color:var(--dourado);}
+
+/* RESPONSIVO */
+@media(max-width:480px){
+  .container{padding:14px;}
+  .card-login{padding:30px 20px;margin-top:20px;}
+  .cartao-saldo .valor{font-size:32px;}
+  .linha{flex-direction:column;align-items:flex-start;}
+  .linha .botoes-acao{align-self:flex-end;}
 }
 </style>
 </head>
 <body>
 
-<!-- TELA DE LOGIN -->
-<div id="loginScreen" class="flex items-center justify-center px-4 py-12 min-h-screen">
-  <div class="w-full max-w-md reveal rounded-2xl p-6 md:p-8 bg-card border border-default shadow-soft">
-    <div class="text-center mb-8">
-      <div style="width:72px;height:72px;border-radius:18px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;color:var(--accent);margin:0 auto 18px;">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v3"/><path d="M12 14v3"/><path d="M16 14v3"/></svg>
+<!-- ======================================
+        TELA DE LOGIN
+====================================== -->
+<div id="telaLogin" class="tela ativa">
+  <div class="container">
+    <div class="card-login">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <h1>BANCO SARA</h1>
+        <p>Sistema Financeiro Escolar</p>
       </div>
-      <h1 class="serif text-4xl md:text-5xl font-bold" style="color:var(--accent);letter-spacing:-0.01em">BANCO SARA</h1>
-      <p style="color:var(--muted)" class="mt-2 text-sm flex items-center justify-center gap-2">
-        Beta 0.0.2 · <span id="syncBadgeLogin" class="sync-badge off">● Conectando...</span>
-      </p>
-    </div>
-    <div class="space-y-4">
-      <div>
-        <label class="block text-xs font-semibold mb-2" style="color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Usuário</label>
-        <input id="loginUser" type="text" placeholder="Digite seu usuário" class="input-field" autocomplete="off">
+
+      <div id="msgLogin" class="msg"></div>
+
+      <div class="grupo-input">
+        <label>Usuário</label>
+        <input type="text" id="loginUsuario" placeholder="Digite seu usuário">
       </div>
-      <div>
-        <label class="block text-xs font-semibold mb-2" style="color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Senha</label>
-        <input id="loginPass" type="password" placeholder="Digite sua senha" class="input-field">
+
+      <div class="grupo-input">
+        <label>Senha</label>
+        <input type="password" id="loginSenha" placeholder="Digite sua senha">
       </div>
-      <button onclick="doLogin()" class="btn-primary w-full py-3.5 text-sm mt-2">ENTRAR NO SISTEMA</button>
-      <p id="loginError" class="text-sm text-center hidden" style="color:var(--danger)">Usuário ou senha incorretos!</p>
-    </div>
-    <div class="mt-6 pt-6" style="border-top:1px solid var(--border)">
-      <p class="text-xs text-center mb-3" style="color:var(--muted)">Acesso rápido para demonstração:</p>
-      <div class="grid grid-cols-3 gap-2">
-        <button onclick="quickLogin('aluno')" class="btn-secondary py-2.5 text-xs font-medium">🎓 Aluno</button>
-        <button onclick="quickLogin('professor')" class="btn-secondary py-2.5 text-xs font-medium">👨‍🏫 Professor</button>
-        <button onclick="quickLogin('colaborador')" class="btn-secondary py-2.5 text-xs font-medium">🏢 Colaborador</button>
+
+      <button class="btn btn-principal" onclick="fazerLogin()">Entrar</button>
+
+      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--cinza);">
+        <p style="font-size:12px;color:var(--texto-claro);text-align:center;margin-bottom:10px;">Contas de teste:</p>
+        <div style="font-size:12px;display:grid;gap:6px;">
+          <div style="padding:8px 10px;background:var(--cinza);border-radius:8px;">👨‍🎓 Aluno: <strong>aluno / 1234</strong></div>
+          <div style="padding:8px 10px;background:var(--cinza);border-radius:8px;">👨‍🏫 Professor: <strong>professor / 1234</strong></div>
+          <div style="padding:8px 10px;background:var(--cinza);border-radius:8px;">🛠️ Colaborador: <strong>colaborador / 1234</strong></div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- APP PRINCIPAL -->
-<div id="appScreen" class="hidden">
-  <div class="flex" style="min-height:100vh;">
-    
-    <!-- Sidebar Desktop -->
-    <aside id="sidebar" class="hidden md:flex md:flex-col w-64 p-4 bg-card border-r border-default" style="position:sticky;top:0;height:100vh;">
-      <div class="flex items-center gap-3 px-2 py-4 mb-6">
-        <div style="width:42px;height:42px;border-radius:12px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;color:var(--accent);flex-shrink:0;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/></svg>
-        </div>
+<!-- ======================================
+        PAINEL PRINCIPAL
+====================================== -->
+<div id="telaPainel" class="tela">
+  <div class="container-grande">
+    <!-- Cabeçalho -->
+    <div class="cabecalho">
+      <div class="esquerdo">
+        <div class="avatar" id="userAvatar">J</div>
         <div>
-          <h2 class="serif text-xl font-bold" style="color:var(--accent)">Banco Sara</h2>
-          <p class="text-xs" style="color:var(--muted)"><span id="sidebarRole">Aluno</span> <span id="sidebarAdminBadge"></span></p>
+          <h2 id="userNome">João Silva</h2>
+          <span class="cargo" id="userCargo">Aluno</span>
         </div>
       </div>
-      <nav class="flex-1 space-y-1">
-        <a onclick="showSection('dashboard')" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" data-nav="dashboard">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          Dashboard
-        </a>
-        <a onclick="showSection('alunos')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hidden" data-nav="alunos" id="navAlunos">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-          Alunos
-        </a>
-        <a onclick="showSection('transferir')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" data-nav="transferir">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3l4 4-4 4"/><path d="M21 7H9"/><path d="M7 21l-4-4 4-4"/><path d="M3 17h12"/></svg>
-          Transferir
-        </a>
-        <a onclick="showSection('extrato')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" data-nav="extrato">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
-          Extrato
-        </a>
-        <a onclick="showSection('relatorios')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hidden" data-nav="relatorios" id="navRelatorios">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
-          Relatórios
-        </a>
-      </nav>
-      <div class="pt-4 mt-4" style="border-top:1px solid var(--border)">
-        <div class="flex items-center gap-3 px-2 py-2 mb-2">
-          <div id="sidebarAvatar" style="width:38px;height:38px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:700;font-size:15px;">A</div>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-semibold truncate" id="sidebarName">João Silva</p>
-            <p class="text-xs truncate" style="color:var(--muted)" id="sidebarEmail">joao@sara.edu</p>
+      <button class="btn btn-sair" onclick="sair()">Sair</button>
+    </div>
+
+    <!-- ÁREA DO ALUNO -->
+    <div id="areaAluno" style="display:none;">
+      <div class="cartao-saldo">
+        <p>Saldo Disponível</p>
+        <div class="valor" id="alunoSaldo">R$ 0,00</div>
+        <div style="display:flex;justify-content:space-between;margin-top:16px;padding-top:16px;border-top:1px solid rgba(0,0,0,0.1);">
+          <div>
+            <p style="font-size:12px;opacity:0.7;">Conta</p>
+            <p style="font-weight:600;" id="alunoConta">0001-2543</p>
+          </div>
+          <div style="text-align:right;">
+            <p style="font-size:12px;opacity:0.7;">E-mail</p>
+            <p style="font-weight:600;font-size:13px;" id="alunoEmail">joao@sara.edu</p>
           </div>
         </div>
-        <div class="px-2 mb-2">
-          <span id="syncBadgeApp" class="sync-badge off w-full justify-center">● Sincronizando...</span>
-        </div>
-        <button onclick="doLogout()" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" style="color:var(--muted)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-          Sair do sistema
-        </button>
       </div>
-    </aside>
 
-    <!-- Conteúdo -->
-    <main class="flex-1 min-w-0">
-      <header class="md:hidden flex items-center justify-between px-4 py-3 bg-card border-b border-default" style="position:sticky;top:0;z-index:10;">
-        <div class="flex items-center gap-2">
-          <div style="width:32px;height:32px;border-radius:8px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;color:var(--accent);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/></svg>
-          </div>
-          <h2 class="serif text-lg font-bold" style="color:var(--accent)">Banco Sara</h2>
-        </div>
-        <button onclick="doLogout()" class="p-2 rounded-lg" style="color:var(--muted)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-        </button>
-      </header>
-
-      <div class="p-4 md:p-8 pb-24 md:pb-8 max-w-6xl mx-auto">
-        
-        <!-- DASHBOARD -->
-        <section id="sec-dashboard" class="section-content">
-          <div class="reveal mb-6 md:mb-8">
-            <p class="text-xs mb-1" style="color:var(--muted);text-transform:uppercase;letter-spacing:0.1em">Olá, <span id="welcomeName">João</span> <span id="welcomeAdminBadge"></span></p>
-            <h1 class="serif text-2xl md:text-3xl font-bold">Seu panorama financeiro</h1>
-          </div>
-
-          <div id="adminMetrics" class="hidden reveal grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="rounded-2xl p-5 card-hover bg-card border border-default" style="border-top:3px solid var(--accent)">
-              <p class="text-xs font-semibold mb-2" style="color:var(--muted);text-transform:uppercase;letter-spacing:0.06em">Dinheiro em circulação</p>
-              <p class="serif text-2xl font-bold" style="color:var(--accent)" id="metricCirc">R$ 0,00</p>
-            </div>
-            <div class="rounded-2xl p-5 card-hover bg-card border border-default" style="border-top:3px solid var(--accent2)">
-              <p class="text-xs font-semibold mb-2" style="color:var(--muted);text-transform:uppercase;letter-spacing:0.06em">Total de alunos</p>
-              <p class="serif text-2xl font-bold" style="color:var(--accent2)" id="metricAlunos">0</p>
-            </div>
-            <div class="rounded-2xl p-5 card-hover bg-card border border-default" style="border-top:3px solid var(--danger)">
-              <p class="text-xs font-semibold mb-2" style="color:var(--muted);text-transform:uppercase;letter-spacing:0.06em">Saldo médio</p>
-              <p class="serif text-2xl font-bold" style="color:var(--danger)" id="metricMedio">R$ 0,00</p>
-            </div>
-          </div>
-
-          <div id="adminChart" class="hidden reveal rounded-2xl p-5 mb-6 bg-card border border-default">
-            <h3 class="serif text-lg font-semibold mb-4">Fluxo de movimentações da escola</h3>
-            <div style="height:280px;width:100%"><canvas id="adminMovChart"></canvas></div>
-          </div>
-
-          <div id="balanceCard" class="reveal rounded-2xl p-6 md:p-7 mb-6 card-hover balance-gradient shadow-soft">
-            <div class="flex items-start justify-between mb-5">
-              <div>
-                <p class="text-xs font-semibold opacity-80" style="text-transform:uppercase;letter-spacing:0.08em">Saldo disponível</p>
-                <p class="serif text-3xl md:text-5xl font-bold mt-1" id="mainBalance">R$ 0,00</p>
-              </div>
-              <div style="width:48px;height:48px;border-radius:14px;background:rgba(26,29,46,.18);display:flex;align-items:center;justify-content:center;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a1d2e" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M8 10h6a2 2 0 010 4h-4a2 2 0 000 4h6"/></svg>
-              </div>
-            </div>
-            <div class="flex items-center gap-6 text-sm" id="accountInfo">
-              <div><p class="opacity-70 text-xs font-medium">Conta</p><p class="font-bold" id="accountNumber">0001-2543</p></div>
-              <div><p class="opacity-70 text-xs font-medium">Agência</p><p class="font-bold">0001</p></div>
-              <div><p class="opacity-70 text-xs font-medium">Tipo</p><p class="font-bold" id="accountType">Conta Aluno</p></div>
-            </div>
-          </div>
-
-          <div class="reveal grid grid-cols-4 gap-2 md:gap-4 mb-6">
-            <button onclick="showSection('transferir')" class="flex flex-col items-center gap-2 p-3 md:p-4 rounded-xl card-hover bg-card border border-default">
-              <div style="width:40px;height:40px;border-radius:12px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;color:var(--accent);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3l4 4-4 4"/><path d="M21 7H9"/></svg></div>
-              <span class="text-xs md:text-sm font-semibold">Pagar</span>
-            </button>
-            <button onclick="showSection('transferir')" class="flex flex-col items-center gap-2 p-3 md:p-4 rounded-xl card-hover bg-card border border-default">
-              <div style="width:40px;height:40px;border-radius:12px;background:var(--accent2-soft);display:flex;align-items:center;justify-content:center;color:var(--accent2);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3l-4 4 4 4"/><path d="M3 7h12"/></svg></div>
-              <span class="text-xs md:text-sm font-semibold">Receber</span>
-            </button>
-            <button onclick="showSection('extrato')" class="flex flex-col items-center gap-2 p-3 md:p-4 rounded-xl card-hover bg-card border border-default">
-              <div style="width:40px;height:40px;border-radius:12px;background:rgba(138,152,184,.14);display:flex;align-items:center;justify-content:center;color:var(--muted);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
-              <span class="text-xs md:text-sm font-semibold">Extrato</span>
-            </button>
-            <button onclick="showSection('alunos')" class="flex flex-col items-center gap-2 p-3 md:p-4 rounded-xl card-hover bg-card border border-default hidden" id="btnAlunos">
-              <div style="width:40px;height:40px;border-radius:12px;background:var(--danger-soft);display:flex;align-items:center;justify-content:center;color:var(--danger);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
-              <span class="text-xs md:text-sm font-semibold">Alunos</span>
-            </button>
-          </div>
-
-          <div id="studentDashboard" class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-            <div class="reveal lg:col-span-2 rounded-2xl p-5 bg-card border border-default">
-              <h3 class="serif text-lg font-semibold mb-4">Suas movimentações</h3>
-              <div style="height:280px;width:100%"><canvas id="movChart"></canvas></div>
-            </div>
-            <div class="reveal rounded-2xl p-5 bg-card border border-default">
-              <h3 class="serif text-lg font-semibold mb-4">Últimas transações</h3>
-              <div id="recentTrans" class="space-y-3"></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ALUNOS -->
-        <section id="sec-alunos" class="section-content hidden">
-          <div class="reveal mb-6 md:mb-8">
-            <p class="text-xs mb-1" style="color:var(--muted);text-transform:uppercase;letter-spacing:0.1em">Gestão</p>
-            <h1 class="serif text-2xl md:text-3xl font-bold mb-2">Lista de Alunos</h1>
-            <p style="color:var(--muted)" class="text-sm">Gerencie saldos e incentive os estudantes</p>
-          </div>
-          <div class="reveal rounded-2xl p-4 md:p-5 bg-card border border-default mb-4">
-            <input type="text" id="searchAluno" placeholder="🔍 Buscar aluno por nome..." class="input-field" oninput="filterAlunos()">
-          </div>
-          <div class="reveal rounded-2xl bg-card border border-default overflow-hidden">
-            <div class="hidden md:grid grid-cols-12 gap-4 p-4 text-xs font-semibold" style="color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border)">
-              <div class="col-span-5">Aluno</div>
-              <div class="col-span-2 text-center">Turma</div>
-              <div class="col-span-2 text-right">Saldo</div>
-              <div class="col-span-3 text-right">Ações</div>
-            </div>
-            <div id="alunosList" class="divide-y"><p class="text-center py-8 text-sm" style="color:var(--muted)">Carregando...</p></div>
-          </div>
-        </section>
-
-        <!-- TRANSFERIR -->
-        <section id="sec-transferir" class="section-content hidden">
-          <div class="reveal mb-6 md:mb-8">
-            <p class="text-xs mb-1" style="color:var(--muted);text-transform:uppercase;letter-spacing:0.1em">Operações</p>
-            <h1 class="serif text-2xl md:text-3xl font-bold mb-2">Transferir valores</h1>
-            <p style="color:var(--muted)" class="text-sm">Seu saldo atual: <strong id="transferBalance" style="color:var(--accent)">R$ 0,00</strong></p>
-          </div>
-          <div class="reveal grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="rounded-2xl p-6 bg-card border border-default">
-              <h3 class="serif text-xl font-semibold mb-5">Nova transferência</h3>
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-xs font-semibold mb-2" style="color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Para quem</label>
-                  <select id="transferDest" class="input-field"></select>
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold mb-2" style="color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Valor (R$)</label>
-                  <input id="transferValor" type="number" min="1" step="0.01" placeholder="0,00" class="input-field">
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold mb-2" style="color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Motivo / Descrição</label>
-                  <input id="transferMotivo" type="text" placeholder="Ex: Participação em aula" class="input-field">
-                </div>
-                <button onclick="doTransfer()" class="btn-primary w-full py-3.5 text-sm font-semibold mt-2">CONFIRMAR TRANSFERÊNCIA</button>
-              </div>
-            </div>
-            <div class="rounded-2xl p-6 bg-card border border-default">
-              <h3 class="serif text-xl font-semibold mb-5">💡 Dicas</h3>
-              <div class="space-y-3">
-                <div class="flex gap-3 p-3 rounded-xl" style="background:var(--accent-soft)">
-                  <span style="color:var(--accent)">✨</span>
-                  <p class="text-sm">Recompense bom comportamento, participação e tarefas concluídas</p>
-                </div>
-                <div class="flex gap-3 p-3 rounded-xl" style="background:var(--accent2-soft)">
-                  <span style="color:var(--accent2)">📚</span>
-                  <p class="text-sm">Incentive a leitura e projetos escolares com valores simbólicos</p>
-                </div>
-                <div class="flex gap-3 p-3 rounded-xl" style="background:rgba(138,152,184,.1)">
-                  <span style="color:var(--muted)">🎯</span>
-                  <p class="text-sm">Valores pequenos e frequentes motivam mais que grandes prêmios</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- EXTRATO -->
-        <section id="sec-extrato" class="section-content hidden">
-          <div class="reveal mb-6 md:mb-8">
-            <p class="text-xs mb-1" style="color:var(--muted);text-transform:uppercase;letter-spacing:0.1em">Histórico</p>
-            <h1 class="serif text-2xl md:text-3xl font-bold mb-2">Extrato completo</h1>
-            <p style="color:var(--muted)" class="text-sm">Todas as suas movimentações</p>
-          </div>
-          <div class="reveal rounded-2xl bg-card border border-default overflow-hidden">
-            <div class="hidden md:grid grid-cols-12 gap-4 p-4 text-xs font-semibold" style="color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border)">
-              <div class="col-span-2">Data</div>
-              <div class="col-span-4">Descrição</div>
-              <div class="col-span-3">Contraparte</div>
-              <div class="col-span-3 text-right">Valor</div>
-            </div>
-            <div id="extratoList" class="divide-y"><p class="text-center py-8 text-sm" style="color:var(--muted)">Carregando...</p></div>
-          </div>
-        </section>
-
-        <!-- RELATÓRIOS -->
-        <section id="sec-relatorios" class="section-content hidden">
-          <div class="reveal mb-6 md:mb-8">
-            <p class="text-xs mb-1" style="color:var(--muted);text-transform:uppercase;letter-spacing:0.1em">Administrativo</p>
-            <h1 class="serif text-2xl md:text-3xl font-bold mb-2">Relatórios gerenciais</h1>
-            <p style="color:var(--muted)" class="text-sm">Visão completa do engajamento escolar</p>
-          </div>
-          <div class="reveal grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div class="rounded-2xl p-5 bg-card border border-default">
-              <h3 class="serif text-lg font-semibold mb-4">Distribuição de saldos</h3>
-              <div style="height:280px;width:100%"><canvas id="chartSaldo"></canvas></div>
-            </div>
-            <div class="rounded-2xl p-5 bg-card border border-default">
-              <h3 class="serif text-lg font-semibold mb-4">Top alunos com maior saldo</h3>
-              <div id="topAlunos" class="space-y-3"></div>
-            </div>
-          </div>
-          <div class="reveal rounded-2xl p-5 bg-card border border-default">
-            <h3 class="serif text-lg font-semibold mb-4">Movimentações totais da escola</h3>
-            <div style="height:280px;width:100%"><canvas id="chartTotal"></canvas></div>
-          </div>
-        </section>
-
+      <div class="card">
+        <h3>📋 Histórico de Movimentações</h3>
+        <div id="alunoHistorico" style="color:var(--texto-claro);text-align:center;padding:20px 0;">Carregando...</div>
       </div>
-    </main>
+    </div>
+
+    <!-- ÁREA DO PROFESSOR -->
+    <div id="areaProfessor" style="display:none;">
+      <!-- Resumo -->
+      <div class="grid-resumo">
+        <div class="card-resumo">
+          <div class="titulo">Total de Alunos</div>
+          <div class="valor" id="profTotalAlunos">0</div>
+        </div>
+        <div class="card-resumo">
+          <div class="titulo">Saldo Total</div>
+          <div class="valor" id="profSaldoTotal">R$ 0,00</div>
+        </div>
+      </div>
+
+      <!-- Abas -->
+      <div class="abas">
+        <button class="aba ativa" onclick="trocarAba('lista')">📋 Lista de Alunos</button>
+        <button class="aba" onclick="trocarAba('adicionar')">➕ Cadastrar Aluno</button>
+      </div>
+
+      <!-- Aba Lista -->
+      <div id="abaLista" class="conteudo-aba ativo">
+        <div class="card">
+          <h3>
+            Alunos Cadastrados
+            <button class="btn btn-principal" style="padding:6px 12px;font-size:13px;width:auto;" onclick="abrirModalCadastro()">+ Novo</button>
+          </h3>
+          <div id="listaAlunos" style="color:var(--texto-claro);text-align:center;padding:20px 0;">Carregando...</div>
+        </div>
+      </div>
+
+      <!-- Aba Adicionar -->
+      <div id="abaAdicionar" class="conteudo-aba">
+        <div class="card">
+          <h3>➕ Cadastrar Novo Aluno</h3>
+          <div id="msgCadastro" class="msg" style="margin-bottom:16px;"></div>
+          <div class="grupo-input">
+            <label>Nome Completo</label>
+            <input type="text" id="novoNome" placeholder="Ex: Maria Silva">
+          </div>
+          <div class="grupo-input">
+            <label>Turma / Série</label>
+            <input type="text" id="novoTurma" placeholder="Ex: 9º Ano">
+          </div>
+          <div class="grupo-input">
+            <label>Senha de Acesso</label>
+            <input type="text" id="novoSenha" placeholder="Ex: 1234">
+          </div>
+          <div class="grupo-input">
+            <label>Saldo Inicial (R$)</label>
+            <input type="number" id="novoSaldo" step="0.01" placeholder="0.00">
+          </div>
+          <button class="btn btn-principal" onclick="cadastrarAluno()">Cadastrar Aluno</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ÁREA DO COLABORADOR -->
+    <div id="areaColaborador" style="display:none;">
+      <div class="grid-resumo">
+        <div class="card-resumo">
+          <div class="titulo">Usuários</div>
+          <div class="valor" id="admTotalUsuarios">0</div>
+        </div>
+        <div class="card-resumo">
+          <div class="titulo">Transações</div>
+          <div class="valor" id="admTotalTransacoes">0</div>
+        </div>
+        <div class="card-resumo">
+          <div class="titulo">Saldo Geral</div>
+          <div class="valor" id="admSaldoGeral">R$ 0,00</div>
+        </div>
+      </div>
+
+      <div class="abas">
+        <button class="aba ativa" onclick="trocarAbaColab('transacoes')">📊 Transações</button>
+        <button class="aba" onclick="trocarAbaColab('gerenciar')">👥 Gerenciar Alunos</button>
+      </div>
+
+      <div id="abaTransacoes" class="conteudo-aba ativo">
+        <div class="card">
+          <h3>Todas as Movimentações</h3>
+          <div id="colabTransacoes" style="color:var(--texto-claro);text-align:center;padding:20px 0;">Carregando...</div>
+        </div>
+      </div>
+
+      <div id="abaGerenciar" class="conteudo-aba">
+        <div class="card">
+          <h3>
+            Gerenciar Alunos
+            <button class="btn btn-principal" style="padding:6px 12px;font-size:13px;width:auto;" onclick="abrirModalCadastro()">+ Novo</button>
+          </h3>
+          <div id="colabListaAlunos" style="color:var(--texto-claro);text-align:center;padding:20px 0;">Carregando...</div>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <nav class="bottom-nav md:hidden" id="bottomNav">
-    <a onclick="showSection('dashboard')" class="bottom-nav-item active" data-nav="dashboard">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      Início
-    </a>
-    <a onclick="showSection('transferir')" class="bottom-nav-item" data-nav="transferir">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3l4 4-4 4"/><path d="M21 7H9"/></svg>
-      Pagar
-    </a>
-    <a onclick="showSection('extrato')" class="bottom-nav-item" data-nav="extrato">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
-      Extrato
-    </a>
-  </nav>
 </div>
 
-<div id="modalSaldo" class="modal-bg hidden">
+<!-- ======================================
+        MODAL MOVIMENTAÇÃO
+====================================== -->
+<div id="modalMovimentacao" class="overlay">
   <div class="modal">
-    <h3 class="serif text-xl font-bold mb-1">Gerenciar saldo</h3>
-    <p class="text-sm mb-4" style="color:var(--muted)" id="modalAlunoNome">—</p>
-    <div class="space-y-4">
-      <div>
-        <label class="block text-xs font-semibold mb-2" style="color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Valor (R$)</label>
-        <input id="modalValor" type="number" min="1" step="0.01" placeholder="0,00" class="input-field">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-2" style="color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Motivo</label>
-        <input id="modalMotivo" type="text" placeholder="Ex: Bom comportamento" class="input-field">
-      </div>
-      <div class="grid grid-cols-2 gap-3 pt-2">
-        <button onclick="execModal('retirar')" class="btn-danger py-3 text-sm font-semibold">RETIRAR</button>
-        <button onclick="execModal('adicionar')" class="btn-success py-3 text-sm font-semibold">ADICIONAR</button>
-      </div>
-      <button onclick="closeModal()" class="btn-secondary w-full py-2.5 text-sm">Cancelar</button>
+    <h3 id="modalMovTitulo">Movimentar Saldo</h3>
+    <p id="modalMovSubtitulo">Aluno: --</p>
+    <input type="hidden" id="modalMovAlunoId">
+    <div class="grupo-input">
+      <label>Tipo</label>
+      <select id="modalMovTipo">
+        <option value="adicionar">➕ Adicionar Saldo</option>
+        <option value="remover">➖ Remover Saldo</option>
+      </select>
+    </div>
+    <div class="grupo-input">
+      <label>Valor (R$)</label>
+      <input type="number" id="modalMovValor" step="0.01" min="0.01" placeholder="0,00">
+    </div>
+    <div class="botoes-modal">
+      <button class="btn btn-cancelar" onclick="fecharModalMov()">Cancelar</button>
+      <button class="btn btn-confirmar" onclick="confirmarMovimentacao()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================
+        MODAL CADASTRAR/EDITAR ALUNO
+====================================== -->
+<div id="modalAluno" class="overlay">
+  <div class="modal">
+    <h3 id="modalAlunoTitulo">Cadastrar Aluno</h3>
+    <input type="hidden" id="modalAlunoId">
+    <div class="grupo-input">
+      <label>Nome Completo</label>
+      <input type="text" id="modalAlunoNome" placeholder="Nome do aluno">
+    </div>
+    <div class="grupo-input">
+      <label>Turma / Série</label>
+      <input type="text" id="modalAlunoTurma" placeholder="Ex: 9º Ano">
+    </div>
+    <div class="grupo-input">
+      <label>Senha</label>
+      <input type="text" id="modalAlunoSenha" placeholder="Senha">
+    </div>
+    <div class="grupo-input">
+      <label>Saldo (R$)</label>
+      <input type="number" id="modalAlunoSaldo" step="0.01" placeholder="0.00">
+    </div>
+    <div class="botoes-modal">
+      <button class="btn btn-cancelar" onclick="fecharModalAluno()">Cancelar</button>
+      <button class="btn btn-confirmar" onclick="salvarAluno()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================
+        MODAL CONFIRMAR EXCLUSÃO
+====================================== -->
+<div id="modalExcluir" class="overlay">
+  <div class="modal">
+    <h3 style="color:var(--erro);">⚠️ Excluir Aluno</h3>
+    <p>Tem certeza que deseja excluir este aluno? Esta ação não pode ser desfeita.</p>
+    <input type="hidden" id="modalExcluirId">
+    <div class="botoes-modal">
+      <button class="btn btn-cancelar" onclick="fecharModalExcluir()">Cancelar</button>
+      <button class="btn btn-remover" onclick="confirmarExcluir()">Excluir</button>
     </div>
   </div>
 </div>
 
 <script>
-// ==================== USUÁRIOS DO SISTEMA ====================
-const USERS = {
-  aluno: { senha: '1234', nome: 'João Silva', email: 'joao@sara.edu', role: 'Aluno', conta: '0001-2543', avatar: 'J' },
-  professor: { senha: '1234', nome: 'Carlos Mendes', email: 'carlos@sara.edu', role: 'Professor', conta: '0001-0001', avatar: 'C', unlimited: true },
-  colaborador: { senha: '1234', nome: 'Vanessa Costa', email: 'vanessa@sara.edu', role: 'Colaborador', conta: '0001-0002', avatar: 'V', unlimited: true, admin: true }
-};
+// ==========================================
+//  CONEXÃO COM O SUPABASE - JÁ CONFIGURADA
+// ==========================================
+const SUPABASE_URL = "https://riizbppmwhkntotukbga.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpaXpicHBtd2hrbnRvdHVrYmdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MjkzNjcsImV4cCI6MjEwMzMwNTM2N30.3ATHYOmxFcujbKoAAgezzMBL9qr7JKY_49gXevHAh58";
 
-let currentUser = null;
-let alunos = [];
-let extrato = [];
-let modalAlvoId = null;
-let charts = {};
-let currentSection = 'dashboard';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ==================== TESTAR CONEXÃO ====================
-async function testarConexao() {
-  try {
-    const { data, error } = await supabase.from('alunos').select('count', { count: 'exact', head: true });
-    if (error) throw error;
-    setSyncStatus(true);
-    toast('Conectado ao Supabase!', 'success');
-    return true;
-  } catch (e) {
-    setSyncStatus(false);
-    toast('Erro na conexão com Supabase: ' + e.message, 'error');
-    console.error(e);
-    return false;
-  }
+let usuarioAtual = null;
+let alunosCache = [];
+
+// ==========================================
+//  FUNÇÕES AUXILIARES
+// ==========================================
+function formatarDinheiro(valor) {
+  return "R$ " + parseFloat(valor || 0).toFixed(2).replace('.', ',');
 }
 
-function setSyncStatus(online) {
-  const badges = [document.getElementById('syncBadgeLogin'), document.getElementById('syncBadgeApp')];
-  badges.forEach(b => {
-    if (!b) return;
-    b.className = 'sync-badge' + (online ? '' : ' off');
-    b.innerHTML = online ? '● Sincronizado' : '● Desconectado';
-  });
+function formatarData(dataStr) {
+  if (!dataStr) return '';
+  const d = new Date(dataStr);
+  return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
 }
 
-// ==================== CARREGAR DADOS ====================
-async function carregarDados() {
-  try {
-    const { data: a, error: e1 } = await supabase.from('alunos').select('*').order('nome');
-    const { data: e, error: e2 } = await supabase.from('extrato').select('*').order('created_at', { ascending: false });
-    
-    if (e1) throw e1;
-    if (e2) throw e2;
-    
-    alunos = a || [];
-    extrato = e || [];
-    
-    atualizarTelaAtual();
-  } catch (err) {
-    toast('Erro ao carregar dados: ' + err.message, 'error');
-  }
+function mostrarMensagem(elementoId, texto, tipo) {
+  const el = document.getElementById(elementoId);
+  el.textContent = texto;
+  el.className = 'msg ' + tipo;
+  setTimeout(() => { el.style.display = 'none'; el.className = 'msg'; }, 4000);
 }
 
-// ==================== REALTIME ====================
-function iniciarRealtime() {
-  supabase.channel('alunos-channel')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'alunos' }, () => {
-      carregarDados();
-      toast('Dados atualizados em tempo real!', 'info');
-    })
-    .subscribe();
+// ==========================================
+//  LOGIN
+// ==========================================
+async function fazerLogin() {
+  const usuario = document.getElementById('loginUsuario').value.trim();
+  const senha = document.getElementById('loginSenha').value;
 
-  supabase.channel('extrato-channel')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'extrato' }, () => {
-      carregarDados();
-    })
-    .subscribe();
-}
-
-// ==================== LOGIN ====================
-function doLogin() {
-  const user = document.getElementById('loginUser').value.trim().toLowerCase();
-  const pass = document.getElementById('loginPass').value.trim();
-  const erro = document.getElementById('loginError');
-  
-  if (!user || !pass) { erro.classList.remove('hidden'); erro.textContent = 'Preencha todos os campos!'; return; }
-  
-  if (USERS[user] && USERS[user].senha === pass) {
-    currentUser = { ...USERS[user], username: user };
-    localStorage.setItem('bancoSara_user', JSON.stringify(currentUser));
-    erro.classList.add('hidden');
-    enterApp();
-  } else {
-    erro.classList.remove('hidden');
-    erro.textContent = 'Usuário ou senha incorretos!';
-  }
-}
-
-function quickLogin(tipo) {
-  document.getElementById('loginUser').value = tipo;
-  document.getElementById('loginPass').value = '1234';
-  doLogin();
-}
-
-function doLogout() {
-  localStorage.removeItem('bancoSara_user');
-  currentUser = null;
-  document.getElementById('appScreen').classList.add('hidden');
-  document.getElementById('loginScreen').classList.remove('hidden');
-  document.getElementById('loginUser').value = '';
-  document.getElementById('loginPass').value = '';
-  Object.values(charts).forEach(c => c && c.destroy());
-  charts = {};
-}
-
-// ==================== NAVEGAÇÃO ====================
-async function enterApp() {
-  document.getElementById('loginScreen').classList.add('hidden');
-  document.getElementById('appScreen').classList.remove('hidden');
-  
-  document.getElementById('sidebarRole').textContent = currentUser.role;
-  document.getElementById('sidebarName').textContent = currentUser.nome;
-  document.getElementById('sidebarEmail').textContent = currentUser.email;
-  document.getElementById('sidebarAvatar').textContent = currentUser.avatar;
-  document.getElementById('welcomeName').textContent = currentUser.nome.split(' ')[0];
-  document.getElementById('accountNumber').textContent = currentUser.conta;
-  
-  const isAdmin = currentUser.admin || currentUser.role === 'Professor';
-  const isColab = currentUser.admin;
-  
-  document.getElementById('navAlunos').classList.toggle('hidden', !isAdmin);
-  document.getElementById('btnAlunos').classList.toggle('hidden', !isAdmin);
-  document.getElementById('navRelatorios').classList.toggle('hidden', !isColab);
-  document.getElementById('adminMetrics').classList.toggle('hidden', !isColab);
-  document.getElementById('adminChart').classList.toggle('hidden', !isColab);
-  document.getElementById('welcomeAdminBadge').innerHTML = isColab ? '<span class="admin-badge">Admin</span>' : '';
-  document.getElementById('sidebarAdminBadge').innerHTML = isColab ? '<span class="admin-badge">Admin</span>' : '';
-  document.getElementById('accountType').textContent = currentUser.role === 'Aluno' ? 'Conta Aluno' : 'Conta Gestora';
-  
-  if (currentUser.unlimited) {
-    document.getElementById('mainBalance').textContent = 'Saldo ilimitado';
-  }
-  
-  await carregarDados();
-  showSection('dashboard');
-}
-
-function showSection(sec) {
-  currentSection = sec;
-  document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
-  document.getElementById('sec-' + sec).classList.remove('hidden');
-  
-  document.querySelectorAll('[data-nav]').forEach(n => n.classList.remove('active'));
-  document.querySelectorAll('[data-nav="' + sec + '"]').forEach(n => n.classList.add('active'));
-  
-  atualizarTelaAtual();
-}
-
-function atualizarTelaAtual() {
-  if (!currentUser) return;
-  if (currentSection === 'dashboard') loadDashboard();
-  if (currentSection === 'alunos') loadAlunos();
-  if (currentSection === 'transferir') loadTransferir();
-  if (currentSection === 'extrato') loadExtrato();
-  if (currentSection === 'relatorios') loadRelatorios();
-}
-
-// ==================== DASHBOARD ====================
-function loadDashboard() {
-  if (!currentUser.unlimited) {
-    const aluno = alunos.find(a => a.email === currentUser.email);
-    if (aluno) document.getElementById('mainBalance').textContent = formatar(aluno.saldo);
-  }
-  
-  if (currentUser.admin) {
-    const total = alunos.reduce((s,a) => s + Number(a.saldo), 0);
-    document.getElementById('metricCirc').textContent = formatar(total);
-    document.getElementById('metricAlunos').textContent = alunos.length;
-    document.getElementById('metricMedio').textContent = formatar(alunos.length ? total / alunos.length : 0);
-    renderAdminChart();
-  }
-  
-  renderMovChart();
-  renderRecentTrans();
-}
-
-function renderMovChart() {
-  if (charts.mov) charts.mov.destroy();
-  const ctx = document.getElementById('movChart').getContext('2d');
-  
-  let meuExtrato = [];
-  if (currentUser.role === 'Aluno') {
-    const aluno = alunos.find(a => a.email === currentUser.email);
-    if (aluno) meuExtrato = extrato.filter(e => e.aluno_id === aluno.id);
-  } else {
-    meuExtrato = extrato;
-  }
-  
-  const dias = {};
-  meuExtrato.forEach(e => {
-    const d = e.data || e.created_at?.split('T')[0];
-    dias[d] = (dias[d] || 0) + Number(e.valor);
-  });
-  
-  const labels = Object.keys(dias).sort().slice(-7);
-  const dados = labels.map(d => Math.abs(dias[d]));
-  
-  charts.mov = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels.length ? labels.map(d => d.slice(5)) : ['Sem dados'],
-      datasets: [{
-        label: 'Valores',
-        data: dados.length ? dados : [0],
-        borderColor: '#d4a24a',
-        backgroundColor: 'rgba(212,162,74,.12)',
-        fill: true, tension: .4, borderWidth: 3, pointRadius: 4, pointBackgroundColor: '#d4a24a'
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { color: 'rgba(138,152,184,.08)' }, ticks: { color: '#8a98b8' } },
-        y: { grid: { color: 'rgba(138,152,184,.08)' }, ticks: { color: '#8a98b8', callback: v => 'R$ ' + v } }
-      }
-    }
-  });
-}
-
-function renderAdminChart() {
-  if (charts.admin) charts.admin.destroy();
-  const ctx = document.getElementById('adminMovChart').getContext('2d');
-  
-  const dias = {};
-  extrato.forEach(e => {
-    const d = e.data || e.created_at?.split('T')[0];
-    if (!dias[d]) dias[d] = { entrada: 0, saida: 0 };
-    if (Number(e.valor) > 0) dias[d].entrada += Number(e.valor);
-    else dias[d].saida += Math.abs(Number(e.valor));
-  });
-  
-  const labels = Object.keys(dias).sort().slice(-7);
-  charts.admin = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels.length ? labels.map(d => d.slice(5)) : ['Sem dados'],
-      datasets: [
-        { label: 'Entradas', data: labels.map(d => dias[d].entrada), backgroundColor: '#4e9c88', borderRadius: 8 },
-        { label: 'Saídas', data: labels.map(d => dias[d].saida), backgroundColor: '#c24a68', borderRadius: 8 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#8a98b8' } } },
-      scales: {
-        x: { grid: { color: 'rgba(138,152,184,.08)' }, ticks: { color: '#8a98b8' } },
-        y: { grid: { color: 'rgba(138,152,184,.08)' }, ticks: { color: '#8a98b8', callback: v => 'R$ ' + v } }
-      }
-    }
-  });
-}
-
-function renderRecentTrans() {
-  const container = document.getElementById('recentTrans');
-  let lista = [];
-  
-  if (currentUser.role === 'Aluno') {
-    const aluno = alunos.find(a => a.email === currentUser.email);
-    if (aluno) lista = extrato.filter(e => e.aluno_id === aluno.id);
-  } else {
-    lista = extrato;
-  }
-  
-  lista = lista.slice(0, 5);
-  
-  if (lista.length === 0) {
-    container.innerHTML = '<p class="text-sm text-center py-4" style="color:var(--muted)">Nenhuma transação ainda</p>';
+  if (!usuario || !senha) {
+    mostrarMensagem('msgLogin', 'Preencha todos os campos!', 'erro');
     return;
   }
-  
-  container.innerHTML = lista.map(t => `
-    <div class="flex items-center justify-between p-2 rounded-lg" style="background:rgba(138,152,184,.06)">
-      <div class="flex items-center gap-3">
-        <div style="width:34px;height:34px;border-radius:10px;background:${Number(t.valor)>0?'var(--accent2-soft)':'var(--danger-soft)'};display:flex;align-items:center;justify-content:center;color:${Number(t.valor)>0?'var(--accent2)':'var(--danger)'};">
-          ${Number(t.valor)>0?'↓':'↑'}
-        </div>
-        <div class="min-w-0">
-          <p class="text-sm font-medium truncate">${t.descricao}</p>
-          <p class="text-xs" style="color:var(--muted)">${formatarData(t.data || t.created_at)}</p>
-        </div>
-      </div>
-      <p class="text-sm font-bold" style="color:${Number(t.valor)>0?'var(--accent2)':'var(--danger)'}">${Number(t.valor)>0?'+':''}${formatar(t.valor)}</p>
-    </div>
-  `).join('');
-}
 
-// ==================== ALUNOS ====================
-function loadAlunos() {
-  renderAlunosList(alunos);
-}
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('username', usuario)
+    .eq('password', senha)
+    .single();
 
-function filterAlunos() {
-  const q = document.getElementById('searchAluno').value.toLowerCase();
-  const filtrados = alunos.filter(a => a.nome.toLowerCase().includes(q) || a.turma.toLowerCase().includes(q));
-  renderAlunosList(filtrados);
-}
-
-function renderAlunosList(lista) {
-  const container = document.getElementById('alunosList');
-  if (lista.length === 0) {
-    container.innerHTML = '<p class="text-center py-8 text-sm" style="color:var(--muted)">Nenhum aluno encontrado</p>';
+  if (error || !data) {
+    mostrarMensagem('msgLogin', 'Usuário ou senha incorretos!', 'erro');
     return;
   }
-  
-  container.innerHTML = lista.map(a => `
-    <div class="student-row grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 p-4 items-center">
-      <div class="md:col-span-5 flex items-center gap-3">
-        <div style="width:40px;height:40px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:700;">${a.nome.charAt(0)}</div>
+
+  usuarioAtual = data;
+  mostrarPainel();
+}
+
+function sair() {
+  usuarioAtual = null;
+  document.getElementById('telaLogin').classList.add('ativa');
+  document.getElementById('telaPainel').classList.remove('ativa');
+  document.getElementById('loginUsuario').value = '';
+  document.getElementById('loginSenha').value = '';
+}
+
+// ==========================================
+//  MOSTRAR PAINEL CORRETO
+// ==========================================
+function mostrarPainel() {
+  document.getElementById('telaLogin').classList.remove('ativa');
+  document.getElementById('telaPainel').classList.add('ativa');
+
+  // Dados do usuário no cabeçalho
+  document.getElementById('userAvatar').textContent = usuarioAtual.name.charAt(0).toUpperCase();
+  document.getElementById('userNome').textContent = usuarioAtual.name;
+  document.getElementById('userCargo').textContent = usuarioAtual.role;
+
+  // Esconde todas as áreas
+  document.getElementById('areaAluno').style.display = 'none';
+  document.getElementById('areaProfessor').style.display = 'none';
+  document.getElementById('areaColaborador').style.display = 'none';
+
+  // Mostra a área correta
+  if (usuarioAtual.role === 'aluno') {
+    document.getElementById('areaAluno').style.display = 'block';
+    carregarAreaAluno();
+  } else if (usuarioAtual.role === 'professor') {
+    document.getElementById('areaProfessor').style.display = 'block';
+    carregarAreaProfessor();
+  } else if (usuarioAtual.role === 'colaborador') {
+    document.getElementById('areaColaborador').style.display = 'block';
+    carregarAreaColaborador();
+  }
+}
+
+// ==========================================
+//  ÁREA DO ALUNO
+// ==========================================
+async function carregarAreaAluno() {
+  document.getElementById('alunoSaldo').textContent = formatarDinheiro(usuarioAtual.balance);
+  document.getElementById('alunoConta').textContent = usuarioAtual.account_number || '---';
+  document.getElementById('alunoEmail').textContent = usuarioAtual.email || '---';
+
+  // Busca o aluno na tabela students
+  const { data: alunoData } = await supabase
+    .from('students')
+    .select('id')
+    .eq('name', usuarioAtual.name)
+    .single();
+
+  if (alunoData) {
+    const { data: transacoes } = await supabase
+      .from('transactions')
+      .select('*')
+      .eq('student_id', alunoData.id)
+      .order('created_at', { ascending: false });
+
+    const container = document.getElementById('alunoHistorico');
+    if (!transacoes || transacoes.length === 0) {
+      container.innerHTML = '<p>Nenhuma movimentação encontrada.</p>';
+      return;
+    }
+
+    container.innerHTML = transacoes.map(t => `
+      <div class="linha" style="border-bottom:1px solid var(--cinza);padding:10px 0;">
         <div>
-          <p class="font-semibold text-sm">${a.nome}</p>
-          <p class="text-xs" style="color:var(--muted)">${a.email || '—'}</p>
+          <div style="font-size:13px;color:var(--texto-claro);">${formatarData(t.created_at)}</div>
+          <div>${t.type === 'adicionar' ? '➕ Adicionado' : '➖ Removido'}</div>
+        </div>
+        <div class="${t.type === 'adicionar' ? 'valor-positivo' : 'valor-negativo'}">
+          ${t.type === 'adicionar' ? '+' : '-'} ${formatarDinheiro(t.amount)}
         </div>
       </div>
-      <div class="md:col-span-2 md:text-center">
-        <span class="text-xs px-2 py-1 rounded-full font-medium" style="background:var(--accent2-soft);color:var(--accent2)">${a.turma}</span>
-      </div>
-      <div class="md:col-span-2 md:text-right">
-        <p class="font-bold" style="color:var(--accent)">${formatar(a.saldo)}</p>
-      </div>
-      <div class="md:col-span-3 md:text-right flex gap-2 md:justify-end">
-        <button onclick="openModal('${a.id}','${a.nome}')" class="btn-primary px-3 py-1.5 text-xs font-semibold">Gerenciar</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-// ==================== TRANSFERIR ====================
-function loadTransferir() {
-  const aluno = alunos.find(a => a.email === currentUser.email);
-  document.getElementById('transferBalance').textContent = currentUser.unlimited ? '∞ (ilimitado)' : formatar(aluno?.saldo || 0);
-  
-  const select = document.getElementById('transferDest');
-  const opcoes = alunos
-    .filter(a => currentUser.role !== 'Aluno' || a.email !== currentUser.email)
-    .map(a => `<option value="${a.id}">${a.nome} — ${a.turma}</option>`).join('');
-  select.innerHTML = opcoes;
-}
-
-async function doTransfer() {
-  const destId = document.getElementById('transferDest').value;
-  const valor = parseFloat(document.getElementById('transferValor').value);
-  const motivo = document.getElementById('transferMotivo').value.trim() || 'Transferência';
-  
-  if (!valor || valor <= 0) { toast('Digite um valor válido!', 'error'); return; }
-  
-  const origem = alunos.find(a => a.email === currentUser.email);
-  if (!currentUser.unlimited && origem && Number(origem.saldo) < valor) {
-    toast('Saldo insuficiente!', 'error'); return;
-  }
-  
-  const destino = alunos.find(a => a.id === destId);
-  
-  try {
-    if (!currentUser.unlimited && origem) {
-      await supabase.from('alunos').update({ saldo: Number(origem.saldo) - valor }).eq('id', origem.id);
-      await supabase.from('extrato').insert({ aluno_id: origem.id, tipo: 'saida', descricao: motivo, contraparte: destino.nome, valor: -valor });
-    }
-    
-    await supabase.from('alunos').update({ saldo: Number(destino.saldo) + valor }).eq('id', destino.id);
-    await supabase.from('extrato').insert({ aluno_id: destino.id, tipo: 'entrada', descricao: motivo, contraparte: currentUser.nome, valor: valor });
-    
-    document.getElementById('transferValor').value = '';
-    document.getElementById('transferMotivo').value = '';
-    toast(`Transferência de ${formatar(valor)} para ${destino.nome} realizada!`, 'success');
-  } catch (e) {
-    toast('Erro: ' + e.message, 'error');
+    `).join('');
   }
 }
 
-// ==================== EXTRATO ====================
-function loadExtrato() {
-  const container = document.getElementById('extratoList');
-  let lista = [];
-  
-  if (currentUser.role === 'Aluno') {
-    const aluno = alunos.find(a => a.email === currentUser.email);
-    if (aluno) lista = extrato.filter(e => e.aluno_id === aluno.id);
-  } else {
-    lista = extrato.map(e => {
-      const a = alunos.find(al => al.id === e.aluno_id);
-      return { ...e, alunoNome: a ? a.nome : '—' };
-    });
-  }
-  
-  if (lista.length === 0) {
-    container.innerHTML = '<p class="text-center py-8 text-sm" style="color:var(--muted)">Nenhuma movimentação registrada</p>';
+// ==========================================
+//  ÁREA DO PROFESSOR
+// ==========================================
+async function carregarAreaProfessor() {
+  await carregarListaAlunos('listaAlunos');
+  atualizarResumoProfessor();
+}
+
+async function carregarListaAlunos(containerId) {
+  const { data: alunos, error } = await supabase
+    .from('students')
+    .select('*')
+    .order('name');
+
+  if (error) {
+    document.getElementById(containerId).innerHTML = '<p style="color:var(--erro);">Erro ao carregar alunos.</p>';
     return;
   }
-  
-  container.innerHTML = lista.map(t => `
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 p-4 items-center">
-      <div class="md:col-span-2 text-sm font-medium" style="color:var(--muted)">${formatarData(t.data || t.created_at)}</div>
-      <div class="md:col-span-4">
-        <p class="text-sm font-semibold">${t.descricao}</p>
-        ${t.alunoNome ? `<p class="text-xs" style="color:var(--muted)">Aluno: ${t.alunoNome}</p>` : ''}
+
+  alunosCache = alunos || [];
+  const container = document.getElementById(containerId);
+
+  if (!alunos || alunos.length === 0) {
+    container.innerHTML = '<p>Nenhum aluno cadastrado ainda.</p>';
+    return;
+  }
+
+  container.innerHTML = alunos.map(a => `
+    <div class="linha">
+      <div>
+        <div class="nome-aluno">${a.name}</div>
+        <div class="info-aluno">${a.class} · Senha: ${a.password}</div>
       </div>
-      <div class="md:col-span-3 text-sm" style="color:var(--muted)">${t.contraparte}</div>
-      <div class="md:col-span-3 md:text-right">
-        <span class="font-bold" style="color:${Number(t.valor)>0?'var(--accent2)':'var(--danger)'}">${Number(t.valor)>0?'+':''}${formatar(t.valor)}</span>
-      </div>
-    </div>
-  `).join('');
-}
-
-// ==================== RELATÓRIOS ====================
-function loadRelatorios() {
-  renderChartSaldo();
-  renderTopAlunos();
-  renderChartTotal();
-}
-
-function renderChartSaldo() {
-  if (charts.saldo) charts.saldo.destroy();
-  const ctx = document.getElementById('chartSaldo').getContext('2d');
-  
-  const faixas = [
-    { nome: 'Até R$ 500', min: 0, max: 500, cor: '#c24a68' },
-    { nome: 'R$ 501 a R$ 1.000', min: 501, max: 1000, cor: '#d4a24a' },
-    { nome: 'R$ 1.001 a R$ 2.000', min: 1001, max: 2000, cor: '#4e9c88' },
-    { nome: 'Acima de R$ 2.000', min: 2001, max: 999999, cor: '#8a98b8' }
-  ];
-  
-  const dados = faixas.map(f => alunos.filter(a => Number(a.saldo) >= f.min && Number(a.saldo) <= f.max).length);
-  
-  charts.saldo = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: faixas.map(f => f.nome),
-      datasets: [{ data: dados, backgroundColor: faixas.map(f => f.cor), borderWidth: 0 }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { color: '#8a98b8', padding: 15 } } }
-    }
-  });
-}
-
-function renderTopAlunos() {
-  const container = document.getElementById('topAlunos');
-  const top = [...alunos].sort((a,b) => Number(b.saldo) - Number(a.saldo)).slice(0, 5);
-  
-  container.innerHTML = top.map((a, i) => `
-    <div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(138,152,184,.06)">
-      <div class="flex items-center gap-3">
-        <div style="width:28px;height:28px;border-radius:8px;background:${i===0?'var(--accent)':i===1?'var(--muted)':i===2?'var(--accent2)':'rgba(138,152,184,.2)'};display:flex;align-items:center;justify-content:center;color:#1a1d2e;font-weight:700;font-size:12px;">${i+1}</div>
-        <div>
-          <p class="text-sm font-semibold">${a.nome}</p>
-          <p class="text-xs" style="color:var(--muted)">${a.turma}</p>
+      <div style="text-align:right;">
+        <div style="font-weight:600;color:var(--dourado);">${formatarDinheiro(a.balance)}</div>
+        <div style="margin-top:4px;">
+          <button class="btn btn-acao btn-adicionar" onclick="abrirModalMov(${a.id}, '${a.name.replace(/'/g, "\\'")}')">Movimentar</button>
+          <button class="btn btn-acao btn-editar" onclick="abrirModalEditar(${a.id})">Editar</button>
+          <button class="btn btn-acao btn-remover" onclick="abrirModalExcluir(${a.id})">×</button>
         </div>
       </div>
-      <p class="font-bold text-sm" style="color:var(--accent)">${formatar(a.saldo)}</p>
     </div>
   `).join('');
 }
 
-function renderChartTotal() {
-  if (charts.total) charts.total.destroy();
-  const ctx = document.getElementById('chartTotal').getContext('2d');
-  
-  const dias = {};
-  extrato.forEach(e => {
-    const d = e.data || e.created_at?.split('T')[0];
-    dias[d] = (dias[d] || 0) + Math.abs(Number(e.valor));
-  });
-  
-  const labels = Object.keys(dias).sort().slice(-10);
-  charts.total = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels.length ? labels.map(d => d.slice(5)) : ['Sem dados'],
-      datasets: [{
-        label: 'Total movimentado',
-        data: labels.length ? labels.map(d => dias[d]) : [0],
-        borderColor: '#d4a24a',
-        backgroundColor: 'rgba(212,162,74,.1)',
-        fill: true, tension: .4, borderWidth: 3
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { color: 'rgba(138,152,184,.08)' }, ticks: { color: '#8a98b8' } },
-        y: { grid: { color: 'rgba(138,152,184,.08)' }, ticks: { color: '#8a98b8', callback: v => 'R$ ' + v } }
-      }
+async function atualizarResumoProfessor() {
+  const { data: alunos } = await supabase.from('students').select('balance');
+  document.getElementById('profTotalAlunos').textContent = alunos ? alunos.length : 0;
+  const total = alunos ? alunos.reduce((s, a) => s + parseFloat(a.balance), 0) : 0;
+  document.getElementById('profSaldoTotal').textContent = formatarDinheiro(total);
+}
+
+// ==========================================
+//  ÁREA DO COLABORADOR
+// ==========================================
+async function carregarAreaColaborador() {
+  // Total de usuários
+  const { count: usersCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
+  document.getElementById('admTotalUsuarios').textContent = usersCount || 0;
+
+  // Saldo geral
+  const { data: alunos } = await supabase.from('students').select('balance');
+  const saldoGeral = alunos ? alunos.reduce((s, a) => s + parseFloat(a.balance), 0) : 0;
+  document.getElementById('admSaldoGeral').textContent = formatarDinheiro(saldoGeral);
+
+  // Transações
+  const { data: transacoes } = await supabase
+    .from('transactions')
+    .select('*, students(name)')
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  document.getElementById('admTotalTransacoes').textContent = transacoes ? transacoes.length : 0;
+
+  const container = document.getElementById('colabTransacoes');
+  if (!transacoes || transacoes.length === 0) {
+    container.innerHTML = '<p>Nenhuma transação registrada.</p>';
+  } else {
+    container.innerHTML = transacoes.map(t => `
+      <div class="linha" style="border-bottom:1px solid var(--cinza);padding:10px 0;">
+        <div>
+          <div style="font-size:13px;color:var(--texto-claro);">${formatarData(t.created_at)}</div>
+          <div class="nome-aluno">${t.students ? t.students.name : '---'}</div>
+        </div>
+        <div class="${t.type === 'adicionar' ? 'valor-positivo' : 'valor-negativo'}">
+          ${t.type === 'adicionar' ? '+' : '-'} ${formatarDinheiro(t.amount)}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Lista de alunos para aba gerenciar
+  await carregarListaAlunos('colabListaAlunos');
+}
+
+// ==========================================
+//  ABAS
+// ==========================================
+function trocarAba(nomeAba) {
+  document.querySelectorAll('#areaProfessor .aba').forEach(b => b.classList.remove('ativa'));
+  document.querySelectorAll('#areaProfessor .conteudo-aba').forEach(c => c.classList.remove('ativo'));
+
+  event.target.classList.add('ativa');
+  document.getElementById('aba' + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)).classList.add('ativo');
+}
+
+function trocarAbaColab(nomeAba) {
+  document.querySelectorAll('#areaColaborador .aba').forEach(b => b.classList.remove('ativa'));
+  document.querySelectorAll('#areaColaborador .conteudo-aba').forEach(c => c.classList.remove('ativo'));
+
+  event.target.classList.add('ativa');
+  document.getElementById('aba' + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)).classList.add('ativo');
+
+  if (nomeAba === 'gerenciar') carregarListaAlunos('colabListaAlunos');
+}
+
+// ==========================================
+//  CADASTRO DE ALUNO
+// ==========================================
+async function cadastrarAluno() {
+  const nome = document.getElementById('novoNome').value.trim();
+  const turma = document.getElementById('novoTurma').value.trim();
+  const senha = document.getElementById('novoSenha').value.trim();
+  const saldo = parseFloat(document.getElementById('novoSaldo').value) || 0;
+
+  if (!nome || !turma || !senha) {
+    mostrarMensagem('msgCadastro', 'Preencha todos os campos!', 'erro');
+    return;
+  }
+
+  const { data, error } = await supabase.from('students').insert([
+    { name: nome, class: turma, password: senha, balance: saldo }
+  ]).select();
+
+  if (error) {
+    mostrarMensagem('msgCadastro', 'Erro ao cadastrar: ' + error.message, 'erro');
+    return;
+  }
+
+  mostrarMensagem('msgCadastro', '✅ Aluno cadastrado com sucesso!', 'sucesso');
+
+  // Limpa o formulário
+  document.getElementById('novoNome').value = '';
+  document.getElementById('novoTurma').value = '';
+  document.getElementById('novoSenha').value = '';
+  document.getElementById('novoSaldo').value = '';
+
+  // Recarrega a lista
+  await carregarListaAlunos('listaAlunos');
+  atualizarResumoProfessor();
+}
+
+// ==========================================
+//  MODAL MOVIMENTAÇÃO
+// ==========================================
+function abrirModalMov(alunoId, alunoNome) {
+  document.getElementById('modalMovAlunoId').value = alunoId;
+  document.getElementById('modalMovSubtitulo').textContent = 'Aluno: ' + alunoNome;
+  document.getElementById('modalMovValor').value = '';
+  document.getElementById('modalMovTipo').value = 'adicionar';
+  document.getElementById('modalMovimentacao').classList.add('ativo');
+}
+
+function fecharModalMov() {
+  document.getElementById('modalMovimentacao').classList.remove('ativo');
+}
+
+async function confirmarMovimentacao() {
+  const alunoId = parseInt(document.getElementById('modalMovAlunoId').value);
+  const tipo = document.getElementById('modalMovTipo').value;
+  const valor = parseFloat(document.getElementById('modalMovValor').value);
+
+  if (!valor || valor <= 0) {
+    alert('Digite um valor válido!');
+    return;
+  }
+
+  // Busca saldo atual
+  const { data: aluno } = await supabase
+    .from('students')
+    .select('balance')
+    .eq('id', alunoId)
+    .single();
+
+  if (!aluno) return;
+
+  let novoSaldo = parseFloat(aluno.balance);
+  if (tipo === 'adicionar') {
+    novoSaldo += valor;
+  } else {
+    if (valor > novoSaldo) {
+      alert('Saldo insuficiente!');
+      return;
     }
-  });
-}
+    novoSaldo -= valor;
+  }
 
-// ==================== MODAL ====================
-function openModal(id, nome) {
-  modalAlvoId = id;
-  document.getElementById('modalAlunoNome').textContent = nome;
-  document.getElementById('modalValor').value = '';
-  document.getElementById('modalMotivo').value = '';
-  document.getElementById('modalSaldo').classList.remove('hidden');
-}
+  // Atualiza saldo
+  await supabase.from('students').update({ balance: novoSaldo }).eq('id', alunoId);
 
-function closeModal() {
-  document.getElementById('modalSaldo').classList.add('hidden');
-  modalAlvoId = null;
-}
+  // Registra transação
+  await supabase.from('transactions').insert([
+    { student_id: alunoId, amount: valor, type: tipo }
+  ]);
 
-async function execModal(acao) {
-  const valor = parseFloat(document.getElementById('modalValor').value);
-  const motivo = document.getElementById('modalMotivo').value.trim() || (acao === 'adicionar' ? 'Incentivo' : 'Ajuste');
-  
-  if (!valor || valor <= 0) { toast('Digite um valor válido!', 'error'); return; }
-  
-  const aluno = alunos.find(a => a.id === modalAlvoId);
-  
-  try {
-    if (acao === 'adicionar') {
-      await supabase.from('alunos').update({ saldo: Number(aluno.saldo) + valor }).eq('id', aluno.id);
-      await supabase.from('extrato').insert({ aluno_id: aluno.id, tipo: 'entrada', descricao: motivo, contraparte: currentUser.nome, valor: valor });
-      toast(`Adicionado ${formatar(valor)} para ${aluno.nome}!`, 'success');
-    } else {
-      if (Number(aluno.saldo) < valor) { toast('Saldo insuficiente!', 'error'); return; }
-      await supabase.from('alunos').update({ saldo: Number(aluno.saldo) - valor }).eq('id', aluno.id);
-      await supabase.from('extrato').insert({ aluno_id: aluno.id, tipo: 'saida', descricao: motivo, contraparte: currentUser.nome, valor: -valor });
-      toast(`Retirado ${formatar(valor)} de ${aluno.nome}!`, 'success');
-    }
-    closeModal();
-  } catch (e) {
-    toast('Erro: ' + e.message, 'error');
+  fecharModalMov();
+  alert('✅ Movimentação realizada!');
+
+  // Recarrega tudo
+  if (usuarioAtual.role === 'professor') {
+    await carregarListaAlunos('listaAlunos');
+    atualizarResumoProfessor();
+  } else {
+    await carregarAreaColaborador();
   }
 }
 
-// ==================== UTILITÁRIOS ====================
-function formatar(v) {
-  return 'R$ ' + Number(v).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+// ==========================================
+//  MODAL CADASTRAR/EDITAR ALUNO
+// ==========================================
+function abrirModalCadastro() {
+  document.getElementById('modalAlunoTitulo').textContent = 'Cadastrar Aluno';
+  document.getElementById('modalAlunoId').value = '';
+  document.getElementById('modalAlunoNome').value = '';
+  document.getElementById('modalAlunoTurma').value = '';
+  document.getElementById('modalAlunoSenha').value = '';
+  document.getElementById('modalAlunoSaldo').value = '';
+  document.getElementById('modalAluno').classList.add('ativo');
 }
 
-function formatarData(d) {
-  if (!d) return '—';
-  const [a, m, dia] = d.split('T')[0].split('-');
-  return `${dia}/${m}`;
+function abrirModalEditar(alunoId) {
+  const aluno = alunosCache.find(a => a.id === alunoId);
+  if (!aluno) return;
+
+  document.getElementById('modalAlunoTitulo').textContent = 'Editar Aluno';
+  document.getElementById('modalAlunoId').value = alunoId;
+  document.getElementById('modalAlunoNome').value = aluno.name;
+  document.getElementById('modalAlunoTurma').value = aluno.class;
+  document.getElementById('modalAlunoSenha').value = aluno.password;
+  document.getElementById('modalAlunoSaldo').value = aluno.balance;
+  document.getElementById('modalAluno').classList.add('ativo');
 }
 
-function toast(msg, tipo = 'success') {
-  const t = document.createElement('div');
-  t.className = `toast ${tipo}`;
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3500);
+function fecharModalAluno() {
+  document.getElementById('modalAluno').classList.remove('ativo');
 }
 
-// ==================== INICIAR TUDO ====================
-document.getElementById('loginPass').addEventListener('keypress', e => { if(e.key==='Enter') doLogin(); });
-document.getElementById('loginUser').addEventListener('keypress', e => { if(e.key==='Enter') document.getElementById('loginPass').focus(); });
+async function salvarAluno() {
+  const id = document.getElementById('modalAlunoId').value;
+  const nome = document.getElementById('modalAlunoNome').value.trim();
+  const turma = document.getElementById('modalAlunoTurma').value.trim();
+  const senha = document.getElementById('modalAlunoSenha').value.trim();
+  const saldo = parseFloat(document.getElementById('modalAlunoSaldo').value) || 0;
 
-const saved = localStorage.getItem('bancoSara_user');
-if (saved) currentUser = JSON.parse(saved);
+  if (!nome || !turma || !senha) {
+    alert('Preencha todos os campos!');
+    return;
+  }
 
-testarConexao().then(conectado => {
-  if (conectado) {
-    iniciarRealtime();
-    if (currentUser) enterApp();
+  if (id) {
+    // Editar
+    await supabase.from('students').update({
+      name: nome, class: turma, password: senha, balance: saldo
+    }).eq('id', parseInt(id));
+  } else {
+    // Novo
+    await supabase.from('students').insert([
+      { name: nome, class: turma, password: senha, balance: saldo }
+    ]);
+  }
+
+  fecharModalAluno();
+  alert('✅ Salvo com sucesso!');
+
+  // Recarrega listas
+  if (usuarioAtual.role === 'professor') {
+    await carregarListaAlunos('listaAlunos');
+    atualizarResumoProfessor();
+  } else {
+    await carregarAreaColaborador();
+  }
+}
+
+// ==========================================
+//  EXCLUIR ALUNO
+// ==========================================
+function abrirModalExcluir(alunoId) {
+  document.getElementById('modalExcluirId').value = alunoId;
+  document.getElementById('modalExcluir').classList.add('ativo');
+}
+
+function fecharModalExcluir() {
+  document.getElementById('modalExcluir').classList.remove('ativo');
+}
+
+async function confirmarExcluir() {
+  const id = parseInt(document.getElementById('modalExcluirId').value);
+
+  // Primeiro apaga as transações do aluno
+  await supabase.from('transactions').delete().eq('student_id", id);
+
+  // Depois apaga o aluno
+  await supabase.from('students').delete().eq('id', id);
+
+  fecharModalExcluir();
+  alert('✅ Aluno excluído!');
+
+  // Recarrega
+  if (usuarioAtual.role === 'professor') {
+    await carregarListaAlunos('listaAlunos');
+    atualizarResumoProfessor();
+  } else {
+    await carregarAreaColaborador();
+  }
+}
+
+// ==========================================
+//  ENTER para logar
+// ==========================================
+document.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter' && document.getElementById('telaLogin').classList.contains('ativa')) {
+    fazerLogin();
   }
 });
 </script>
