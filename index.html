@@ -3,839 +3,681 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Banco Sara · Beta 0.0.2</title>
+<title>Banco Sara</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <style>
 :root{
-  --preto:#0F1115;
-  --preto-claro:#1A1D23;
-  --cinza:#2A2E37;
-  --dourado:#D4AF37;
-  --dourado-claro:#F0D76C;
-  --dourado-escuro:#B8960C;
-  --texto:#FFFFFF;
-  --texto-claro:#B0B3B8;
-  --erro:#E53935;
-  --sucesso:#4CAF50;
+  --bg:#0F1018;
+  --card:#1A1C2B;
+  --text:#F0F2F8;
+  --muted:#8890AA;
+  --gold:#D4AF37;
+  --gold-light:#F0D77C;
+  --gold-border:rgba(212,175,55,.2);
+  --border:rgba(136,144,170,.12);
 }
-
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;}
-body{background:var(--preto);color:var(--texto);min-height:100vh;}
-
-/* TELAS */
-.tela{display:none;min-height:100vh;}
-.tela.ativa{display:block;}
-
-/* CONTAINER CENTRAL */
-.container{max-width:440px;margin:0 auto;padding:20px;}
-.container-grande{max-width:900px;margin:0 auto;padding:20px;}
-
-/* CARD LOGIN */
-.card-login{background:var(--preto-claro);border:1px solid var(--cinza);border-radius:20px;padding:40px 30px;margin-top:40px;box-shadow:0 10px 40px rgba(0,0,0,0.5);}
-.logo{text-align:center;margin-bottom:30px;}
-.logo-icon{width:72px;height:72px;background:linear-gradient(135deg,var(--dourado),var(--dourado-escuro));border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
-.logo-icon svg{width:36px;height:36px;fill:var(--preto);}
-.logo h1{font-size:34px;font-weight:700;color:var(--dourado);letter-spacing:3px;}
-.logo p{color:var(--texto-claro);font-size:14px;margin-top:6px;}
-
-/* INPUTS */
-.grupo-input{margin-bottom:16px;}
-label{display:block;font-size:14px;color:var(--texto-claro);margin-bottom:8px;}
-input, select{width:100%;padding:12px 14px;background:var(--cinza);border:1px solid transparent;border-radius:10px;color:var(--texto);font-size:15px;outline:none;transition:all 0.2s;}
-input:focus, select:focus{border-color:var(--dourado);box-shadow:0 0 0 2px rgba(212,175,55,0.15);}
-input::placeholder{color:#6B6F76;}
-
-/* BOTÕES */
-.btn{padding:12px 16px;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s;}
-.btn-principal{background:linear-gradient(90deg,var(--dourado),var(--dourado-claro));color:var(--preto);width:100%;}
-.btn-principal:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(212,175,55,0.25);}
-btn-principal:active{transform:translateY(0);}
-btn-sair{background:transparent;color:var(--texto-claro);border:1px solid var(--cinza);margin-top:20px;}
-.btn-sair:hover{border-color:var(--erro);color:var(--erro);}
-.btn-adicionar{background:var(--sucesso);color:white;}
-.btn-remover{background:var(--erro);color:white;}
-btn-editar{background:var(--dourado);color:var(--preto);}
-.btn-acao{padding:7px 12px;font-size:13px;width:auto;margin:0 3px;}
-.btn-icone{background:transparent;border:none;color:var(--texto-claro);padding:4px 8px;cursor:pointer;border-radius:6px;}
-.btn-icone:hover{background:var(--cinza);color:var(--dourado);}
-
-/* MENSAGEM */
-.msg{margin-top:14px;padding:12px;border-radius:8px;text-align:center;font-size:14px;display:none;}
-.msg.erro{background:rgba(229,57,53,0.1);color:#EF5350;display:block;}
-.msg.sucesso{background:rgba(76,175,80,0.1);color:#66BB6A;display:block;}
-
-/* CABEÇALHO PAINEL */
-.cabecalho{display:flex;justify-content:space-between;align-items:center;padding:20px 0;margin-bottom:24px;border-bottom:1px solid var(--cinza);flex-wrap:wrap;gap:12px;}
-.cabecalho .esquerdo{display:flex;align-items:center;gap:14px;}
-.avatar{width:44px;height:44px;background:linear-gradient(135deg,var(--dourado),var(--dourado-escuro));border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--preto);font-weight:700;font-size:18px;}
-h2{font-size:20px;color:var(--dourado);}
-.cargo{font-size:12px;background:var(--cinza);color:var(--dourado-claro);padding:3px 10px;border-radius:12px;margin-left:8px;}
-
-/* CARTÃO SALDO */
-.cartao-saldo{background:linear-gradient(135deg,var(--dourado-escuro),var(--dourado));border-radius:16px;padding:28px;color:var(--preto);margin-bottom:24px;}
-.cartao-saldo p{font-size:14px;opacity:0.85;}
-.cartao-saldo .valor{font-size:40px;font-weight:700;margin:6px 0;}
-
-/* CARD LISTA */
-.card{background:var(--preto-claro);border:1px solid var(--cinza);border-radius:14px;padding:20px;margin-bottom:16px;}
-.card h3{font-size:16px;margin-bottom:16px;color:var(--dourado-claro);display:flex;justify-content:space-between;align-items:center;}
-
-/* TABELA E ITENS */
-.linha{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--cinza);flex-wrap:wrap;gap:8px;}
-.linha:last-child{border-bottom:none;}
-.nome-aluno{font-weight:500;}
-.info-aluno{font-size:13px;color:var(--texto-claro);margin-top:2px;}
-.valor-positivo{color:#66BB6A;font-weight:600;}
-.valor-negativo{color:#EF5350;font-weight:600;}
-
-/* ABAS */
-.abas{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
-.aba{background:var(--cinza);color:var(--texto-claro);border:none;padding:10px 16px;border-radius:8px;cursor:pointer;font-size:14px;transition:all 0.2s;}
-.aba.ativa{background:var(--dourado);color:var(--preto);font-weight:600;}
-.conteudo-aba{display:none;}
-.conteudo-aba.ativo{display:block;}
-
-/* MODAL */
-.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;padding:20px;z-index:1000;}
-.overlay.ativo{display:flex;}
-.modal{background:var(--preto-claro);border:1px solid var(--dourado);border-radius:16px;padding:24px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;}
-.modal h3{color:var(--dourado);margin-bottom:6px;}
-.modal p{color:var(--texto-claro);font-size:14px;margin-bottom:20px;}
-.botoes-modal{display:flex;gap:10px;margin-top:20px;}
-.btn-cancelar{background:var(--cinza);color:var(--texto);flex:1;}
-.btn-confirmar{background:var(--dourado);color:var(--preto);flex:1;}
-
-/* RESUMO CARDS */
-.grid-resumo{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px;}
-.card-resumo{background:var(--preto-claro);border:1px solid var(--cinza);border-radius:12px;padding:16px;}
-.card-resumo .titulo{font-size:12px;color:var(--texto-claro);margin-bottom:6px;}
-.card-resumo .valor{font-size:24px;font-weight:700;color:var(--dourado);}
-
-/* RESPONSIVO */
-@media(max-width:480px){
-  .container{padding:14px;}
-  .card-login{padding:30px 20px;margin-top:20px;}
-  .cartao-saldo .valor{font-size:32px;}
-  .linha{flex-direction:column;align-items:flex-start;}
-  .linha .botoes-acao{align-self:flex-end;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Inter',sans-serif;
+  background:radial-gradient(800px 400px at top center, rgba(212,175,55,.06), transparent 60%), var(--bg);
+  min-height:100vh;
+  color:var(--text);
 }
+h1,h2,h3{font-family:'Playfair Display',serif;}
+.container{max-width:1200px;margin:0 auto;padding:20px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;transition:.2s;}
+.card:hover{border-color:var(--gold);transform:translateY(-1px);}
+.btn{border-radius:10px;padding:10px 20px;border:none;font-weight:600;cursor:pointer;transition:.2s;font-size:14px;}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#000;font-weight:700;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(212,175,55,.25);}
+.btn-green{background:#2563EB;color:#fff;}
+.btn-red{background:rgba(239,68,68,.1);color:#EF4444;border:1px solid rgba(239,68,68,.2);}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.input{width:100%;padding:12px 14px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:15px;}
+.input:focus{outline:none;border-color:var(--gold);}
+.badge{display:inline-block;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:600;text-transform:uppercase;}
+.badge-admin{background:rgba(212,175,55,.08);color:var(--gold);border:1px solid var(--gold-border);}
+.badge-professor{background:rgba(59,130,246,.08);color:#60A5FA;border:1px solid rgba(59,130,246,.15);}
+.badge-colaborador{background:rgba(136,144,170,.08);color:var(--muted);border:1px solid rgba(136,144,170,.15);}
+.badge-aluno{background:rgba(16,185,129,.08);color:#34D399;border:1px solid rgba(16,185,129,.15);}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
+table{width:100%;border-collapse:collapse;margin-top:12px;}
+th{text-align:left;padding:12px 10px;font-size:11px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);}
+td{padding:14px 10px;border-bottom:1px solid var(--border);font-size:14px;}
+tr:hover{background:rgba(212,175,55,.02);}
+.hidden{display:none !important;}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:20px;z-index:100;}
+.modal.show{display:flex;}
+.modal-content{background:var(--card);border:1px solid var(--gold-border);border-radius:20px;padding:28px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;}
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--border);margin-bottom:24px;flex-wrap:wrap;}
+.tab{padding:10px 18px;cursor:pointer;border-bottom:2px solid transparent;font-weight:600;color:var(--muted);transition:.2s;}
+.tab.active{border-bottom-color:var(--gold);color:var(--gold);}
+.section{display:none;}
+.section.active{display:block;}
+.error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#ef4444;padding:10px 14px;border-radius:8px;margin-bottom:16px;display:none;}
+.flex-between{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+.valor-dourado{color:var(--gold);font-weight:700;font-size:28px;font-family:'Playfair Display',serif;}
+@media(max-width:600px){.container{padding:12px;}.modal-content{padding:20px;}}
 </style>
 </head>
 <body>
 
-<!-- ======================================
-        TELA DE LOGIN
-====================================== -->
-<div id="telaLogin" class="tela ativa">
-  <div class="container">
-    <div class="card-login">
-      <div class="logo">
-        <div class="logo-icon">
-          <svg viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        </div>
-        <h1>BANCO SARA</h1>
-        <p>Sistema Financeiro Escolar</p>
+<div id="loginPage" class="container" style="display:flex;align-items:center;justify-content:center;min-height:100vh;">
+  <div class="card" style="width:100%;max-width:420px;padding:36px 32px;border-radius:24px;background:linear-gradient(180deg,#1A1C2B 0%,#141622 100%);border:1px solid var(--gold-border);box-shadow:0 8px 40px rgba(0,0,0,.3);">
+    <div style="text-align:center;margin-bottom:36px;">
+      <!-- LOGO BANCO SARA -->
+      <div style="width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,#D4AF37 0%,#F0D77C 50%,#D4AF37 100%);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 4px 20px rgba(212,175,55,.25);">
+        <span style="font-size:36px;font-weight:bold;color:#000;">S</span>
       </div>
-
-      <div id="msgLogin" class="msg"></div>
-
-      <div class="grupo-input">
-        <label>Usuário</label>
-        <input type="text" id="loginUsuario" placeholder="Digite seu usuário">
-      </div>
-
-      <div class="grupo-input">
-        <label>Senha</label>
-        <input type="password" id="loginSenha" placeholder="Digite sua senha">
-      </div>
-
-      <button class="btn btn-principal" onclick="fazerLogin()">Entrar</button>
-
-      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--cinza);">
-        <p style="font-size:12px;color:var(--texto-claro);text-align:center;margin-bottom:10px;">Contas de teste:</p>
-        <div style="font-size:12px;display:grid;gap:6px;">
-          <div style="padding:8px 10px;background:var(--cinza);border-radius:8px;">👨‍🎓 Aluno: <strong>aluno / 1234</strong></div>
-          <div style="padding:8px 10px;background:var(--cinza);border-radius:8px;">👨‍🏫 Professor: <strong>professor / 1234</strong></div>
-          <div style="padding:8px 10px;background:var(--cinza);border-radius:8px;">🛠️ Colaborador: <strong>colaborador / 1234</strong></div>
-        </div>
-      </div>
+      <h2 style="margin:0;color:#fff;font-size:28px;font-weight:700;letter-spacing:2px;">BANCO SARA</h2>
+      <p style="color:var(--muted);margin:8px 0 0;font-size:14px;">Sistema de Incentivo Estudantil</p>
+      <div style="width:60px;height:2px;background:linear-gradient(90deg,transparent,#D4AF37,transparent);margin:16px auto 0;"></div>
     </div>
+    <div id="loginError" class="error"></div>
+    <div style="margin-bottom:14px;">
+      <label style="font-size:12px;color:var(--muted);font-weight:600;">USUÁRIO</label>
+      <input type="text" id="inpLogin" class="input" placeholder="Digite seu usuário">
+    </div>
+    <div style="margin-bottom:20px;">
+      <label style="font-size:12px;color:var(--muted);font-weight:600;">SENHA</label>
+      <input type="password" id="inpSenha" class="input" placeholder="Digite sua senha">
+    </div>
+    <button onclick="entrar()" class="btn btn-primary" style="width:100%;font-size:16px;">ENTRAR</button>
   </div>
 </div>
 
-<!-- ======================================
-        PAINEL PRINCIPAL
-====================================== -->
-<div id="telaPainel" class="tela">
-  <div class="container-grande">
-    <!-- Cabeçalho -->
-    <div class="cabecalho">
-      <div class="esquerdo">
-        <div class="avatar" id="userAvatar">J</div>
-        <div>
-          <h2 id="userNome">João Silva</h2>
-          <span class="cargo" id="userCargo">Aluno</span>
-        </div>
+<div id="mainPage" class="container hidden">
+  <div class="flex-between" style="padding-bottom:16px;border-bottom:1px solid var(--border);margin-bottom:20px;">
+    <div>
+      <h2 style="margin:0;color:var(--gold);font-size:26px;">BANCO SARA</h2>
+      <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span id="nomeUsuario" style="font-weight:600;">Usuário</span>
+        <span id="badgePerfil" class="badge badge-admin">admin</span>
       </div>
-      <button class="btn btn-sair" onclick="sair()">Sair</button>
     </div>
+    <button onclick="sair()" class="btn btn-outline">Sair</button>
+  </div>
 
-    <!-- ÁREA DO ALUNO -->
-    <div id="areaAluno" style="display:none;">
-      <div class="cartao-saldo">
-        <p>Saldo Disponível</p>
-        <div class="valor" id="alunoSaldo">R$ 0,00</div>
-        <div style="display:flex;justify-content:space-between;margin-top:16px;padding-top:16px;border-top:1px solid rgba(0,0,0,0.1);">
-          <div>
-            <p style="font-size:12px;opacity:0.7;">Conta</p>
-            <p style="font-weight:600;" id="alunoConta">0001-2543</p>
-          </div>
-          <div style="text-align:right;">
-            <p style="font-size:12px;opacity:0.7;">E-mail</p>
-            <p style="font-weight:600;font-size:13px;" id="alunoEmail">joao@sara.edu</p>
-          </div>
-        </div>
+  <div id="barraAbas" class="tabs"></div>
+
+  <!-- MEU SALDO — ALUNO -->
+  <div id="secMeuSaldo" class="section">
+    <div class="card" style="text-align:center;padding:40px 28px;">
+      <p style="color:var(--muted);font-size:14px;text-transform:uppercase;letter-spacing:1px;">Meu Saldo</p>
+      <p id="meuSaldoValor" class="valor-dourado" style="font-size:52px;margin:20px 0;">R$ 0,00</p>
+      <p id="meuTurma" style="color:var(--muted);">Turma: —</p>
+      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
+        <p style="color:var(--muted);font-size:13px;">Continue se dedicando e conquistando mais incentivos! ⭐</p>
       </div>
+    </div>
+  </div>
 
+  <!-- RESUMO -->
+  <div id="secResumo" class="section">
+    <div class="grid mb">
       <div class="card">
-        <h3>📋 Histórico de Movimentações</h3>
-        <div id="alunoHistorico" style="color:var(--texto-claro);text-align:center;padding:20px 0;">Carregando...</div>
+        <p style="color:var(--muted);font-size:13px;text-transform:uppercase;">Total de Alunos</p>
+        <p id="qtdAlunos" style="font-size:34px;font-weight:700;margin:8px 0 0;">0</p>
+      </div>
+      <div class="card">
+        <p style="color:var(--muted);font-size:13px;text-transform:uppercase;">Saldo Geral</p>
+        <p id="saldoGeral" class="valor-dourado" style="margin:8px 0 0;">R$ 0,00</p>
+      </div>
+      <div class="card">
+        <p style="color:var(--muted);font-size:13px;text-transform:uppercase;">Usuários Ativos</p>
+        <p id="qtdUsuarios" style="font-size:34px;font-weight:700;margin:8px 0 0;">0</p>
       </div>
     </div>
+  </div>
 
-    <!-- ÁREA DO PROFESSOR -->
-    <div id="areaProfessor" style="display:none;">
-      <!-- Resumo -->
-      <div class="grid-resumo">
-        <div class="card-resumo">
-          <div class="titulo">Total de Alunos</div>
-          <div class="valor" id="profTotalAlunos">0</div>
-        </div>
-        <div class="card-resumo">
-          <div class="titulo">Saldo Total</div>
-          <div class="valor" id="profSaldoTotal">R$ 0,00</div>
-        </div>
+  <!-- ALUNOS -->
+  <div id="secAlunos" class="section">
+    <div class="card">
+      <div class="flex-between mb">
+        <h3 style="margin:0;font-size:20px;">Lista de Alunos</h3>
+        <button id="btnNovoAluno" onclick="abrirModalAluno()" class="btn btn-primary">+ Novo Aluno</button>
       </div>
-
-      <!-- Abas -->
-      <div class="abas">
-        <button class="aba ativa" onclick="trocarAba('lista')">📋 Lista de Alunos</button>
-        <button class="aba" onclick="trocarAba('adicionar')">➕ Cadastrar Aluno</button>
-      </div>
-
-      <!-- Aba Lista -->
-      <div id="abaLista" class="conteudo-aba ativo">
-        <div class="card">
-          <h3>
-            Alunos Cadastrados
-            <button class="btn btn-principal" style="padding:6px 12px;font-size:13px;width:auto;" onclick="abrirModalCadastro()">+ Novo</button>
-          </h3>
-          <div id="listaAlunos" style="color:var(--texto-claro);text-align:center;padding:20px 0;">Carregando...</div>
-        </div>
-      </div>
-
-      <!-- Aba Adicionar -->
-      <div id="abaAdicionar" class="conteudo-aba">
-        <div class="card">
-          <h3>➕ Cadastrar Novo Aluno</h3>
-          <div id="msgCadastro" class="msg" style="margin-bottom:16px;"></div>
-          <div class="grupo-input">
-            <label>Nome Completo</label>
-            <input type="text" id="novoNome" placeholder="Ex: Maria Silva">
-          </div>
-          <div class="grupo-input">
-            <label>Turma / Série</label>
-            <input type="text" id="novoTurma" placeholder="Ex: 9º Ano">
-          </div>
-          <div class="grupo-input">
-            <label>Senha de Acesso</label>
-            <input type="text" id="novoSenha" placeholder="Ex: 1234">
-          </div>
-          <div class="grupo-input">
-            <label>Saldo Inicial (R$)</label>
-            <input type="number" id="novoSaldo" step="0.01" placeholder="0.00">
-          </div>
-          <button class="btn btn-principal" onclick="cadastrarAluno()">Cadastrar Aluno</button>
-        </div>
-      </div>
+      <div id="tabelaAlunos">Carregando...</div>
     </div>
+  </div>
 
-    <!-- ÁREA DO COLABORADOR -->
-    <div id="areaColaborador" style="display:none;">
-      <div class="grid-resumo">
-        <div class="card-resumo">
-          <div class="titulo">Usuários</div>
-          <div class="valor" id="admTotalUsuarios">0</div>
-        </div>
-        <div class="card-resumo">
-          <div class="titulo">Transações</div>
-          <div class="valor" id="admTotalTransacoes">0</div>
-        </div>
-        <div class="card-resumo">
-          <div class="titulo">Saldo Geral</div>
-          <div class="valor" id="admSaldoGeral">R$ 0,00</div>
-        </div>
-      </div>
+  <!-- GRAFICO -->
+  <div id="secGrafico" class="section">
+    <div class="card">
+      <h3 style="margin-top:0;">Distribuição de Saldo por Turma</h3>
+      <canvas id="grafico" style="max-height:320px;margin-top:20px;"></canvas>
+    </div>
+  </div>
 
-      <div class="abas">
-        <button class="aba ativa" onclick="trocarAbaColab('transacoes')">📊 Transações</button>
-        <button class="aba" onclick="trocarAbaColab('gerenciar')">👥 Gerenciar Alunos</button>
+  <!-- USUARIOS -->
+  <div id="secUsuarios" class="section">
+    <div class="card">
+      <div class="flex-between mb">
+        <h3 style="margin:0;font-size:20px;">Gerenciar Usuários</h3>
+        <button onclick="abrirModalUsuario()" class="btn btn-primary">+ Novo Usuário</button>
       </div>
-
-      <div id="abaTransacoes" class="conteudo-aba ativo">
-        <div class="card">
-          <h3>Todas as Movimentações</h3>
-          <div id="colabTransacoes" style="color:var(--texto-claro);text-align:center;padding:20px 0;">Carregando...</div>
-        </div>
-      </div>
-
-      <div id="abaGerenciar" class="conteudo-aba">
-        <div class="card">
-          <h3>
-            Gerenciar Alunos
-            <button class="btn btn-principal" style="padding:6px 12px;font-size:13px;width:auto;" onclick="abrirModalCadastro()">+ Novo</button>
-          </h3>
-          <div id="colabListaAlunos" style="color:var(--texto-claro);text-align:center;padding:20px 0;">Carregando...</div>
-        </div>
-      </div>
+      <div id="tabelaUsuarios">Carregando...</div>
     </div>
   </div>
 </div>
 
-<!-- ======================================
-        MODAL MOVIMENTAÇÃO
-====================================== -->
-<div id="modalMovimentacao" class="overlay">
-  <div class="modal">
-    <h3 id="modalMovTitulo">Movimentar Saldo</h3>
-    <p id="modalMovSubtitulo">Aluno: --</p>
-    <input type="hidden" id="modalMovAlunoId">
-    <div class="grupo-input">
-      <label>Tipo</label>
-      <select id="modalMovTipo">
-        <option value="adicionar">➕ Adicionar Saldo</option>
-        <option value="remover">➖ Remover Saldo</option>
+<!-- MODAL ALUNO -->
+<div id="modalAluno" class="modal">
+  <div class="modal-content">
+    <h3 id="tituloModalAluno" style="color:var(--gold);margin-top:0;">Cadastrar Aluno</h3>
+    <input type="hidden" id="alunoId">
+    <div style="margin-bottom:12px;">
+      <label style="font-size:13px;color:var(--muted);font-weight:600;">NOME COMPLETO</label>
+      <input type="text" id="alunoNome" class="input" placeholder="Nome do aluno">
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:13px;color:var(--muted);font-weight:600;">TURMA</label>
+      <input type="text" id="alunoTurma" class="input" placeholder="Ex: 1º Ano">
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:13px;color:var(--muted);font-weight:600;">SENHA</label>
+      <input type="text" id="alunoSenha" class="input" placeholder="Senha de acesso">
+    </div>
+    <div style="margin-bottom:20px;">
+      <label style="font-size:13px;color:var(--muted);font-weight:600;">SALDO INICIAL (R$)</label>
+      <input type="number" id="alunoSaldo" class="input" step="0.01" placeholder="0.00">
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="fecharModalAluno()" class="btn btn-outline" style="flex:1;">Cancelar</button>
+      <button onclick="salvarAluno()" class="btn btn-primary" style="flex:1;">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MOVIMENTACAO -->
+<div id="modalMov" class="modal">
+  <div class="modal-content">
+    <h3 style="color:var(--gold);margin-top:0;">Movimentar Saldo</h3>
+    <p id="nomeAlunoMov" style="color:var(--muted);margin-bottom:16px;">Aluno: —</p>
+    <input type="hidden" id="movAlunoId">
+    <div style="margin-bottom:12px;">
+      <label style="font-size:13px;color:var(--muted);font-weight:600;">TIPO</label>
+      <select id="movTipo" class="input">
+        <option value="adicionar">➕ Adicionar (Incentivo)</option>
+        <option value="remover">➖ Remover</option>
       </select>
     </div>
-    <div class="grupo-input">
-      <label>Valor (R$)</label>
-      <input type="number" id="modalMovValor" step="0.01" min="0.01" placeholder="0,00">
+    <div style="margin-bottom:20px;">
+      <label style="font-size:13px;color:var(--muted);font-weight:600;">VALOR (R$)</label>
+      <input type="number" id="movValor" class="input" step="0.01" min="0.01" placeholder="0.00">
     </div>
-    <div class="botoes-modal">
-      <button class="btn btn-cancelar" onclick="fecharModalMov()">Cancelar</button>
-      <button class="btn btn-confirmar" onclick="confirmarMovimentacao()">Confirmar</button>
-    </div>
-  </div>
-</div>
-
-<!-- ======================================
-        MODAL CADASTRAR/EDITAR ALUNO
-====================================== -->
-<div id="modalAluno" class="overlay">
-  <div class="modal">
-    <h3 id="modalAlunoTitulo">Cadastrar Aluno</h3>
-    <input type="hidden" id="modalAlunoId">
-    <div class="grupo-input">
-      <label>Nome Completo</label>
-      <input type="text" id="modalAlunoNome" placeholder="Nome do aluno">
-    </div>
-    <div class="grupo-input">
-      <label>Turma / Série</label>
-      <input type="text" id="modalAlunoTurma" placeholder="Ex: 9º Ano">
-    </div>
-    <div class="grupo-input">
-      <label>Senha</label>
-      <input type="text" id="modalAlunoSenha" placeholder="Senha">
-    </div>
-    <div class="grupo-input">
-      <label>Saldo (R$)</label>
-      <input type="number" id="modalAlunoSaldo" step="0.01" placeholder="0.00">
-    </div>
-    <div class="botoes-modal">
-      <button class="btn btn-cancelar" onclick="fecharModalAluno()">Cancelar</button>
-      <button class="btn btn-confirmar" onclick="salvarAluno()">Salvar</button>
+    <div style="display:flex;gap:10px;">
+      <button onclick="fecharModalMov()" class="btn btn-outline" style="flex:1;">Cancelar</button>
+      <button onclick="confirmarMov()" class="btn btn-primary" style="flex:1;">Confirmar</button>
     </div>
   </div>
 </div>
 
-<!-- ======================================
-        MODAL CONFIRMAR EXCLUSÃO
-====================================== -->
-<div id="modalExcluir" class="overlay">
-  <div class="modal">
-    <h3 style="color:var(--erro);">⚠️ Excluir Aluno</h3>
-    <p>Tem certeza que deseja excluir este aluno? Esta ação não pode ser desfeita.</p>
-    <input type="hidden" id="modalExcluirId">
-    <div class="botoes-modal">
-      <button class="btn btn-cancelar" onclick="fecharModalExcluir()">Cancelar</button>
-      <button class="btn btn-remover" onclick="confirmarExcluir()">Excluir</button>
+<!-- MODAL USUARIO -->
+<div id="modalUsuario" class="modal">
+  <div class="modal-content">
+    <h3 id="tituloModalUsuario" style="color:var(--gold);margin-top:0;">Cadastrar Usuário</h3>
+    <input type="hidden" id="usuarioId">
+    <div style="margin-bottom:12px;">
+      <label style="font-size:13px;color:var(--muted);font-weight:600;">NOME COMPLETO</label>
+      <input type="text" id="usuarioNome" class="input" placeholder="Nome completo">
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:13px;color:var(--muted);font-weight:600;">LOGIN</label>
+      <input type="text" id="usuarioLogin" class="input" placeholder="Nome de usuário">
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:13px;color:var(--muted);font-weight:600;">SENHA</label>
+      <input type="text" id="usuarioSenha" class="input" placeholder="Senha">
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:13px;color:var(--muted);font-weight:600;">E-MAIL (opcional)</label>
+      <input type="text" id="usuarioEmail" class="input" placeholder="email@escola.edu">
+    </div>
+    <div style="margin-bottom:20px;">
+      <label style="font-size:13px;color:var(--muted);font-weight:600;">PERFIL</label>
+      <select id="usuarioPerfil" class="input">
+        <option value="professor">👨‍🏫 Professor</option>
+        <option value="colaborador">🤝 Colaborador</option>
+        <option value="aluno">👨‍🎓 Aluno</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="fecharModalUsuario()" class="btn btn-outline" style="flex:1;">Cancelar</button>
+      <button onclick="salvarUsuario()" class="btn btn-primary" style="flex:1;">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EXCLUIR -->
+<div id="modalExcluir" class="modal">
+  <div class="modal-content" style="text-align:center;">
+    <h3 style="color:#EF4444;margin-top:0;">⚠️ Confirmar Exclusão?</h3>
+    <p style="color:var(--muted);">Esta ação não pode ser desfeita.</p>
+    <input type="hidden" id="excluirId">
+    <input type="hidden" id="excluirTipo">
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button onclick="fecharModalExcluir()" class="btn btn-outline" style="flex:1;">Cancelar</button>
+      <button onclick="confirmarExcluir()" class="btn btn-red" style="flex:1;">Excluir</button>
     </div>
   </div>
 </div>
 
 <script>
 // ==========================================
-//  CONEXÃO COM O SUPABASE - JÁ CONFIGURADA
+// CONFIGURACAO SUPABASE — COLOQUE SUAS CREDENCIAIS AQUI
 // ==========================================
 const SUPABASE_URL = "https://riizbppmwhkntotukbga.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpaXpicHBtd2hrbnRvdHVrYmdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MjkzNjcsImV4cCI6MjEwMzMwNTM2N30.3ATHYOmxFcujbKoAAgezzMBL9qr7JKY_49gXevHAh58";
-
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let usuarioAtual = null;
-let alunosCache = [];
+let usuarioLogado = null;
+let alunos = [];
+let usuarios = [];
+let grafico = null;
 
-// ==========================================
-//  FUNÇÕES AUXILIARES
-// ==========================================
-function formatarDinheiro(valor) {
-  return "R$ " + parseFloat(valor || 0).toFixed(2).replace('.', ',');
+function formatarDinheiro(v) {
+  return "R$ " + parseFloat(v || 0).toFixed(2).replace('.', ',');
 }
 
-function formatarData(dataStr) {
-  if (!dataStr) return '';
-  const d = new Date(dataStr);
-  return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
-}
-
-function mostrarMensagem(elementoId, texto, tipo) {
-  const el = document.getElementById(elementoId);
+function mostrarErro(id, texto) {
+  const el = document.getElementById(id);
   el.textContent = texto;
-  el.className = 'msg ' + tipo;
-  setTimeout(() => { el.style.display = 'none'; el.className = 'msg'; }, 4000);
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 4000);
 }
 
 // ==========================================
-//  LOGIN
+// LOGIN
 // ==========================================
-async function fazerLogin() {
-  const usuario = document.getElementById('loginUsuario').value.trim();
-  const senha = document.getElementById('loginSenha').value;
-
-  if (!usuario || !senha) {
-    mostrarMensagem('msgLogin', 'Preencha todos os campos!', 'erro');
+async function entrar() {
+  const login = document.getElementById('inpLogin').value.trim();
+  const senha = document.getElementById('inpSenha').value;
+  
+  if (!login || !senha) {
+    mostrarErro('loginError', 'Preencha usuário e senha!');
     return;
   }
 
-  const { data, error } = await supabase
-    .from('users')
+  // Busca em usuarios
+  let { data, error } = await supabase
+    .from('usuarios')
     .select('*')
-    .eq('username', usuario)
-    .eq('password', senha)
+    .eq('login', login)
+    .eq('senha', senha)
     .single();
 
   if (error || !data) {
-    mostrarMensagem('msgLogin', 'Usuário ou senha incorretos!', 'erro');
-    return;
+    // Se não achou, busca em alunos
+    const { data: alunoData, error: alunoErr } = await supabase
+      .from('alunos')
+      .select('*')
+      .eq('nome', login)
+      .eq('senha', senha)
+      .single();
+    
+    if (alunoErr || !alunoData) {
+      mostrarErro('loginError', 'Usuário ou senha incorretos!');
+      return;
+    }
+    
+    usuarioLogado = {
+      id: alunoData.id,
+      nome: alunoData.nome,
+      perfil: 'aluno',
+      turma: alunoData.turma,
+      saldo: alunoData.saldo
+    };
+  } else {
+    usuarioLogado = data;
   }
 
-  usuarioAtual = data;
-  mostrarPainel();
+  carregarPagina();
 }
 
 function sair() {
-  usuarioAtual = null;
-  document.getElementById('telaLogin').classList.add('ativa');
-  document.getElementById('telaPainel').classList.remove('ativa');
-  document.getElementById('loginUsuario').value = '';
-  document.getElementById('loginSenha').value = '';
+  usuarioLogado = null;
+  document.getElementById('loginPage').classList.remove('hidden');
+  document.getElementById('mainPage').classList.add('hidden');
+  document.getElementById('inpLogin').value = '';
+  document.getElementById('inpSenha').value = '';
 }
 
 // ==========================================
-//  MOSTRAR PAINEL CORRETO
+// MONTAR INTERFACE
 // ==========================================
-function mostrarPainel() {
-  document.getElementById('telaLogin').classList.remove('ativa');
-  document.getElementById('telaPainel').classList.add('ativa');
+function carregarPagina() {
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('mainPage').classList.remove('hidden');
+  
+  document.getElementById('nomeUsuario').textContent = usuarioLogado.nome;
+  const badge = document.getElementById('badgePerfil');
+  badge.textContent = usuarioLogado.perfil;
+  badge.className = 'badge badge-' + usuarioLogado.perfil;
 
-  // Dados do usuário no cabeçalho
-  document.getElementById('userAvatar').textContent = usuarioAtual.name.charAt(0).toUpperCase();
-  document.getElementById('userNome').textContent = usuarioAtual.name;
-  document.getElementById('userCargo').textContent = usuarioAtual.role;
+  const abas = document.getElementById('barraAbas');
+  abas.innerHTML = '';
+  const secoes = [];
 
-  // Esconde todas as áreas
-  document.getElementById('areaAluno').style.display = 'none';
-  document.getElementById('areaProfessor').style.display = 'none';
-  document.getElementById('areaColaborador').style.display = 'none';
-
-  // Mostra a área correta
-  if (usuarioAtual.role === 'aluno') {
-    document.getElementById('areaAluno').style.display = 'block';
-    carregarAreaAluno();
-  } else if (usuarioAtual.role === 'professor') {
-    document.getElementById('areaProfessor').style.display = 'block';
-    carregarAreaProfessor();
-  } else if (usuarioAtual.role === 'colaborador') {
-    document.getElementById('areaColaborador').style.display = 'block';
-    carregarAreaColaborador();
-  }
-}
-
-// ==========================================
-//  ÁREA DO ALUNO
-// ==========================================
-async function carregarAreaAluno() {
-  document.getElementById('alunoSaldo').textContent = formatarDinheiro(usuarioAtual.balance);
-  document.getElementById('alunoConta').textContent = usuarioAtual.account_number || '---';
-  document.getElementById('alunoEmail').textContent = usuarioAtual.email || '---';
-
-  // Busca o aluno na tabela students
-  const { data: alunoData } = await supabase
-    .from('students')
-    .select('id')
-    .eq('name', usuarioAtual.name)
-    .single();
-
-  if (alunoData) {
-    const { data: transacoes } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('student_id', alunoData.id)
-      .order('created_at', { ascending: false });
-
-    const container = document.getElementById('alunoHistorico');
-    if (!transacoes || transacoes.length === 0) {
-      container.innerHTML = '<p>Nenhuma movimentação encontrada.</p>';
-      return;
+  if (usuarioLogado.perfil === 'aluno') {
+    secoes.push({id: 'secMeuSaldo', nome: '💰 Meu Saldo'});
+  } else {
+    secoes.push({id: 'secResumo', nome: '📊 Resumo'});
+    secoes.push({id: 'secAlunos', nome: '👥 Alunos'});
+    secoes.push({id: 'secGrafico', nome: '📈 Gráfico'});
+    if (usuarioLogado.perfil === 'admin') {
+      secoes.push({id: 'secUsuarios', nome: '👤 Usuários'});
     }
-
-    container.innerHTML = transacoes.map(t => `
-      <div class="linha" style="border-bottom:1px solid var(--cinza);padding:10px 0;">
-        <div>
-          <div style="font-size:13px;color:var(--texto-claro);">${formatarData(t.created_at)}</div>
-          <div>${t.type === 'adicionar' ? '➕ Adicionado' : '➖ Removido'}</div>
-        </div>
-        <div class="${t.type === 'adicionar' ? 'valor-positivo' : 'valor-negativo'}">
-          ${t.type === 'adicionar' ? '+' : '-'} ${formatarDinheiro(t.amount)}
-        </div>
-      </div>
-    `).join('');
-  }
-}
-
-// ==========================================
-//  ÁREA DO PROFESSOR
-// ==========================================
-async function carregarAreaProfessor() {
-  await carregarListaAlunos('listaAlunos');
-  atualizarResumoProfessor();
-}
-
-async function carregarListaAlunos(containerId) {
-  const { data: alunos, error } = await supabase
-    .from('students')
-    .select('*')
-    .order('name');
-
-  if (error) {
-    document.getElementById(containerId).innerHTML = '<p style="color:var(--erro);">Erro ao carregar alunos.</p>';
-    return;
   }
 
-  alunosCache = alunos || [];
-  const container = document.getElementById(containerId);
+  secoes.forEach((aba, i) => {
+    const el = document.createElement('div');
+    el.className = 'tab' + (i === 0 ? ' active' : '');
+    el.textContent = aba.nome;
+    el.onclick = () => abrirSecao(aba.id, el);
+    abas.appendChild(el);
+  });
 
-  if (!alunos || alunos.length === 0) {
-    container.innerHTML = '<p>Nenhum aluno cadastrado ainda.</p>';
-    return;
-  }
+  const btnNovoAluno = document.getElementById('btnNovoAluno');
+  btnNovoAluno.style.display = usuarioLogado.perfil === 'colaborador' ? 'none' : 'block';
 
-  container.innerHTML = alunos.map(a => `
-    <div class="linha">
-      <div>
-        <div class="nome-aluno">${a.name}</div>
-        <div class="info-aluno">${a.class} · Senha: ${a.password}</div>
-      </div>
-      <div style="text-align:right;">
-        <div style="font-weight:600;color:var(--dourado);">${formatarDinheiro(a.balance)}</div>
-        <div style="margin-top:4px;">
-          <button class="btn btn-acao btn-adicionar" onclick="abrirModalMov(${a.id}, '${a.name.replace(/'/g, "\\'")}')">Movimentar</button>
-          <button class="btn btn-acao btn-editar" onclick="abrirModalEditar(${a.id})">Editar</button>
-          <button class="btn btn-acao btn-remover" onclick="abrirModalExcluir(${a.id})">×</button>
-        </div>
-      </div>
-    </div>
-  `).join('');
-}
-
-async function atualizarResumoProfessor() {
-  const { data: alunos } = await supabase.from('students').select('balance');
-  document.getElementById('profTotalAlunos').textContent = alunos ? alunos.length : 0;
-  const total = alunos ? alunos.reduce((s, a) => s + parseFloat(a.balance), 0) : 0;
-  document.getElementById('profSaldoTotal').textContent = formatarDinheiro(total);
-}
-
-// ==========================================
-//  ÁREA DO COLABORADOR
-// ==========================================
-async function carregarAreaColaborador() {
-  // Total de usuários
-  const { count: usersCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
-  document.getElementById('admTotalUsuarios').textContent = usersCount || 0;
-
-  // Saldo geral
-  const { data: alunos } = await supabase.from('students').select('balance');
-  const saldoGeral = alunos ? alunos.reduce((s, a) => s + parseFloat(a.balance), 0) : 0;
-  document.getElementById('admSaldoGeral').textContent = formatarDinheiro(saldoGeral);
-
-  // Transações
-  const { data: transacoes } = await supabase
-    .from('transactions')
-    .select('*, students(name)')
-    .order('created_at', { ascending: false })
-    .limit(50);
-
-  document.getElementById('admTotalTransacoes').textContent = transacoes ? transacoes.length : 0;
-
-  const container = document.getElementById('colabTransacoes');
-  if (!transacoes || transacoes.length === 0) {
-    container.innerHTML = '<p>Nenhuma transação registrada.</p>';
+  abrirSecao(secoes[0].id, abas.firstChild);
+  
+  if (usuarioLogado.perfil === 'aluno') {
+    document.getElementById('meuSaldoValor').textContent = formatarDinheiro(usuarioLogado.saldo);
+    document.getElementById('meuTurma').textContent = 'Turma: ' + usuarioLogado.turma;
   } else {
-    container.innerHTML = transacoes.map(t => `
-      <div class="linha" style="border-bottom:1px solid var(--cinza);padding:10px 0;">
-        <div>
-          <div style="font-size:13px;color:var(--texto-claro);">${formatarData(t.created_at)}</div>
-          <div class="nome-aluno">${t.students ? t.students.name : '---'}</div>
-        </div>
-        <div class="${t.type === 'adicionar' ? 'valor-positivo' : 'valor-negativo'}">
-          ${t.type === 'adicionar' ? '+' : '-'} ${formatarDinheiro(t.amount)}
-        </div>
-      </div>
-    `).join('');
+    carregarTudo();
   }
+}
 
-  // Lista de alunos para aba gerenciar
-  await carregarListaAlunos('colabListaAlunos');
+function abrirSecao(id, abaEl) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  abaEl.classList.add('active');
+  if (id === 'secGrafico') desenharGrafico();
+}
+
+async function carregarTudo() {
+  await Promise.all([carregarResumo(), carregarListaAlunos()]);
+  if (usuarioLogado.perfil === 'admin') carregarListaUsuarios();
 }
 
 // ==========================================
-//  ABAS
+// RESUMO
 // ==========================================
-function trocarAba(nomeAba) {
-  document.querySelectorAll('#areaProfessor .aba').forEach(b => b.classList.remove('ativa'));
-  document.querySelectorAll('#areaProfessor .conteudo-aba').forEach(c => c.classList.remove('ativo'));
-
-  event.target.classList.add('ativa');
-  document.getElementById('aba' + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)).classList.add('ativo');
-}
-
-function trocarAbaColab(nomeAba) {
-  document.querySelectorAll('#areaColaborador .aba').forEach(b => b.classList.remove('ativa'));
-  document.querySelectorAll('#areaColaborador .conteudo-aba').forEach(c => c.classList.remove('ativo'));
-
-  event.target.classList.add('ativa');
-  document.getElementById('aba' + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1)).classList.add('ativo');
-
-  if (nomeAba === 'gerenciar') carregarListaAlunos('colabListaAlunos');
+async function carregarResumo() {
+  const { data: listaAlunos } = await supabase.from('alunos').select('saldo');
+  const { count } = await supabase.from('usuarios').select('*', { count: 'exact', head: true });
+  
+  const total = listaAlunos ? listaAlunos.reduce((s, a) => s + parseFloat(a.saldo), 0) : 0;
+  document.getElementById('qtdAlunos').textContent = listaAlunos ? listaAlunos.length : 0;
+  document.getElementById('saldoGeral').textContent = formatarDinheiro(total);
+  document.getElementById('qtdUsuarios').textContent = count || 0;
 }
 
 // ==========================================
-//  CADASTRO DE ALUNO
+// LISTA DE ALUNOS
 // ==========================================
-async function cadastrarAluno() {
-  const nome = document.getElementById('novoNome').value.trim();
-  const turma = document.getElementById('novoTurma').value.trim();
-  const senha = document.getElementById('novoSenha').value.trim();
-  const saldo = parseFloat(document.getElementById('novoSaldo').value) || 0;
-
-  if (!nome || !turma || !senha) {
-    mostrarMensagem('msgCadastro', 'Preencha todos os campos!', 'erro');
+async function carregarListaAlunos() {
+  const { data, error } = await supabase.from('alunos').select('*').order('nome');
+  alunos = data || [];
+  const el = document.getElementById('tabelaAlunos');
+  
+  if (error) { el.innerHTML = '<p style="color:#EF4444;">Erro ao carregar</p>'; return; }
+  if (!data || data.length === 0) {
+    el.innerHTML = '<p style="text-align:center;color:var(--muted);padding:20px;">Nenhum aluno cadastrado.</p>';
     return;
   }
 
-  const { data, error } = await supabase.from('students').insert([
-    { name: nome, class: turma, password: senha, balance: saldo }
-  ]).select();
+  const podeEditar = usuarioLogado.perfil !== 'colaborador';
 
-  if (error) {
-    mostrarMensagem('msgCadastro', 'Erro ao cadastrar: ' + error.message, 'erro');
-    return;
-  }
-
-  mostrarMensagem('msgCadastro', '✅ Aluno cadastrado com sucesso!', 'sucesso');
-
-  // Limpa o formulário
-  document.getElementById('novoNome').value = '';
-  document.getElementById('novoTurma').value = '';
-  document.getElementById('novoSenha').value = '';
-  document.getElementById('novoSaldo').value = '';
-
-  // Recarrega a lista
-  await carregarListaAlunos('listaAlunos');
-  atualizarResumoProfessor();
+  el.innerHTML = '<table><thead><tr><th>Nome</th><th>Turma</th><th>Saldo</th>' + 
+    (podeEditar ? '<th style="text-align:right;">Ações</th>' : '') + '</tr></thead><tbody>' +
+    alunos.map(a => '<tr><td><strong>' + a.nome + '</strong></td><td>' + a.turma + '</td><td>' + formatarDinheiro(a.saldo) + '</td>' +
+      (podeEditar ? '<td style="text-align:right;">' +
+        '<button class="btn btn-green" style="padding:4px 10px;font-size:12px;margin-right:4px;" onclick="abrirModalMov(' + a.id + ',\'' + a.nome.replace(/'/g, "\\'") + '\')">💰</button>' +
+        '<button class="btn btn-outline" style="padding:4px 10px;font-size:12px;margin-right:4px;" onclick="editarAluno(' + a.id + ')">✏️</button>' +
+        '<button class="btn btn-red" style="padding:4px 8px;font-size:12px;" onclick="abrirModalExcluirAluno(' + a.id + ')">×</button>' +
+        '</td>' : '') + '</tr>').join('') +
+    '</tbody></table>';
 }
 
 // ==========================================
-//  MODAL MOVIMENTAÇÃO
+// GRAFICO
 // ==========================================
-function abrirModalMov(alunoId, alunoNome) {
-  document.getElementById('modalMovAlunoId').value = alunoId;
-  document.getElementById('modalMovSubtitulo').textContent = 'Aluno: ' + alunoNome;
-  document.getElementById('modalMovValor').value = '';
-  document.getElementById('modalMovTipo').value = 'adicionar';
-  document.getElementById('modalMovimentacao').classList.add('ativo');
-}
+async function desenharGrafico() {
+  const { data } = await supabase.from('alunos').select('turma, saldo');
+  if (!data) return;
 
-function fecharModalMov() {
-  document.getElementById('modalMovimentacao').classList.remove('ativo');
-}
+  const porTurma = {};
+  data.forEach(a => {
+    if (!porTurma[a.turma]) porTurma[a.turma] = 0;
+    porTurma[a.turma] += parseFloat(a.saldo);
+  });
 
-async function confirmarMovimentacao() {
-  const alunoId = parseInt(document.getElementById('modalMovAlunoId').value);
-  const tipo = document.getElementById('modalMovTipo').value;
-  const valor = parseFloat(document.getElementById('modalMovValor').value);
-
-  if (!valor || valor <= 0) {
-    alert('Digite um valor válido!');
-    return;
-  }
-
-  // Busca saldo atual
-  const { data: aluno } = await supabase
-    .from('students')
-    .select('balance')
-    .eq('id', alunoId)
-    .single();
-
-  if (!aluno) return;
-
-  let novoSaldo = parseFloat(aluno.balance);
-  if (tipo === 'adicionar') {
-    novoSaldo += valor;
-  } else {
-    if (valor > novoSaldo) {
-      alert('Saldo insuficiente!');
-      return;
+  const ctx = document.getElementById('grafico').getContext('2d');
+  if (grafico) grafico.destroy();
+  
+  grafico = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(porTurma),
+      datasets: [{
+        label: 'Saldo por Turma (R$)',
+        data: Object.values(porTurma),
+        backgroundColor: '#D4AF37',
+        borderRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { ticks: { color: '#8890AA' }, grid: { color: 'rgba(136,144,170,.08)' } },
+        x: { ticks: { color: '#8890AA' }, grid: { display: false } }
+      }
     }
-    novoSaldo -= valor;
-  }
-
-  // Atualiza saldo
-  await supabase.from('students').update({ balance: novoSaldo }).eq('id', alunoId);
-
-  // Registra transação
-  await supabase.from('transactions').insert([
-    { student_id: alunoId, amount: valor, type: tipo }
-  ]);
-
-  fecharModalMov();
-  alert('✅ Movimentação realizada!');
-
-  // Recarrega tudo
-  if (usuarioAtual.role === 'professor') {
-    await carregarListaAlunos('listaAlunos');
-    atualizarResumoProfessor();
-  } else {
-    await carregarAreaColaborador();
-  }
+  });
 }
 
 // ==========================================
-//  MODAL CADASTRAR/EDITAR ALUNO
+// CRUD ALUNO
 // ==========================================
-function abrirModalCadastro() {
-  document.getElementById('modalAlunoTitulo').textContent = 'Cadastrar Aluno';
-  document.getElementById('modalAlunoId').value = '';
-  document.getElementById('modalAlunoNome').value = '';
-  document.getElementById('modalAlunoTurma').value = '';
-  document.getElementById('modalAlunoSenha').value = '';
-  document.getElementById('modalAlunoSaldo').value = '';
-  document.getElementById('modalAluno').classList.add('ativo');
+function abrirModalAluno() {
+  document.getElementById('tituloModalAluno').textContent = 'Cadastrar Aluno';
+  document.getElementById('alunoId').value = '';
+  document.getElementById('alunoNome').value = '';
+  document.getElementById('alunoTurma').value = '';
+  document.getElementById('alunoSenha').value = '';
+  document.getElementById('alunoSaldo').value = '';
+  document.getElementById('modalAluno').classList.add('show');
 }
 
-function abrirModalEditar(alunoId) {
-  const aluno = alunosCache.find(a => a.id === alunoId);
-  if (!aluno) return;
-
-  document.getElementById('modalAlunoTitulo').textContent = 'Editar Aluno';
-  document.getElementById('modalAlunoId').value = alunoId;
-  document.getElementById('modalAlunoNome').value = aluno.name;
-  document.getElementById('modalAlunoTurma').value = aluno.class;
-  document.getElementById('modalAlunoSenha').value = aluno.password;
-  document.getElementById('modalAlunoSaldo').value = aluno.balance;
-  document.getElementById('modalAluno').classList.add('ativo');
+function editarAluno(id) {
+  const a = alunos.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('tituloModalAluno').textContent = 'Editar Aluno';
+  document.getElementById('alunoId').value = id;
+  document.getElementById('alunoNome').value = a.nome;
+  document.getElementById('alunoTurma').value = a.turma;
+  document.getElementById('alunoSenha').value = a.senha;
+  document.getElementById('alunoSaldo').value = a.saldo;
+  document.getElementById('modalAluno').classList.add('show');
 }
 
 function fecharModalAluno() {
-  document.getElementById('modalAluno').classList.remove('ativo');
+  document.getElementById('modalAluno').classList.remove('show');
 }
 
 async function salvarAluno() {
-  const id = document.getElementById('modalAlunoId').value;
-  const nome = document.getElementById('modalAlunoNome').value.trim();
-  const turma = document.getElementById('modalAlunoTurma').value.trim();
-  const senha = document.getElementById('modalAlunoSenha').value.trim();
-  const saldo = parseFloat(document.getElementById('modalAlunoSaldo').value) || 0;
+  const id = document.getElementById('alunoId').value;
+  const nome = document.getElementById('alunoNome').value.trim();
+  const turma = document.getElementById('alunoTurma').value.trim();
+  const senha = document.getElementById('alunoSenha').value.trim();
+  const saldo = parseFloat(document.getElementById('alunoSaldo').value) || 0;
 
-  if (!nome || !turma || !senha) {
-    alert('Preencha todos os campos!');
-    return;
-  }
+  if (!nome || !turma || !senha) { alert('Preencha todos os campos!'); return; }
 
   if (id) {
-    // Editar
-    await supabase.from('students').update({
-      name: nome, class: turma, password: senha, balance: saldo
-    }).eq('id', parseInt(id));
+    await supabase.from('alunos').update({ nome, turma, senha, saldo }).eq('id', parseInt(id));
   } else {
-    // Novo
-    await supabase.from('students').insert([
-      { name: nome, class: turma, password: senha, balance: saldo }
-    ]);
+    await supabase.from('alunos').insert([{ nome, turma, senha, saldo }]);
   }
 
   fecharModalAluno();
-  alert('✅ Salvo com sucesso!');
-
-  // Recarrega listas
-  if (usuarioAtual.role === 'professor') {
-    await carregarListaAlunos('listaAlunos');
-    atualizarResumoProfessor();
-  } else {
-    await carregarAreaColaborador();
-  }
+  await carregarTudo();
 }
 
 // ==========================================
-//  EXCLUIR ALUNO
+// MOVIMENTACAO
 // ==========================================
-function abrirModalExcluir(alunoId) {
-  document.getElementById('modalExcluirId').value = alunoId;
-  document.getElementById('modalExcluir').classList.add('ativo');
+function abrirModalMov(id, nome) {
+  document.getElementById('movAlunoId').value = id;
+  document.getElementById('nomeAlunoMov').textContent = 'Aluno: ' + nome;
+  document.getElementById('movValor').value = '';
+  document.getElementById('modalMov').classList.add('show');
+}
+
+function fecharModalMov() {
+  document.getElementById('modalMov').classList.remove('show');
+}
+
+async function confirmarMov() {
+  const id = parseInt(document.getElementById('movAlunoId').value);
+  const tipo = document.getElementById('movTipo').value;
+  const valor = parseFloat(document.getElementById('movValor').value);
+  
+  if (!valor || valor <= 0) { alert('Digite um valor válido!'); return; }
+
+  const { data: aluno } = await supabase.from('alunos').select('saldo').eq('id', id).single();
+  if (!aluno) return;
+
+  let novoSaldo = parseFloat(aluno.saldo);
+  if (tipo === 'adicionar') novoSaldo += valor;
+  else {
+    if (valor > novoSaldo) { alert('Saldo insuficiente!'); return; }
+    novoSaldo -= valor;
+  }
+
+  await supabase.from('alunos').update({ saldo: novoSaldo }).eq('id', id);
+  await supabase.from('transacoes').insert([{ aluno_id: id, valor, tipo }]);
+  
+  fecharModalMov();
+  await carregarTudo();
+}
+
+// ==========================================
+// USUARIOS
+// ==========================================
+async function carregarListaUsuarios() {
+  const { data, error } = await supabase.from('usuarios').select('*').order('nome');
+  usuarios = data || [];
+  const el = document.getElementById('tabelaUsuarios');
+  
+  if (error) { el.innerHTML = '<p style="color:#EF4444;">Erro ao carregar</p>'; return; }
+  if (!data || data.length === 0) {
+    el.innerHTML = '<p style="text-align:center;color:var(--muted);padding:20px;">Nenhum usuário cadastrado.</p>';
+    return;
+  }
+
+  el.innerHTML = '<table><thead><tr><th>Nome</th><th>Login</th><th>Perfil</th><th>E-mail</th><th style="text-align:right;">Ações</th></tr></thead><tbody>' +
+    usuarios.map(u => '<tr><td><strong>' + u.nome + '</strong>' + (u.perfil === 'admin' ? ' <small style="color:var(--gold)">(principal)</small>' : '') + '</td><td>' + u.login + '</td><td><span class="badge badge-' + u.perfil + '">' + u.perfil + '</span></td><td>' + (u.email || '—') + '</td><td style="text-align:right;">' +
+      (u.perfil !== 'admin' ? '<button class="btn btn-outline" style="padding:4px 10px;font-size:12px;margin-right:4px;" onclick="editarUsuario(' + u.id + ')">✏️</button><button class="btn btn-red" style="padding:4px 8px;font-size:12px;" onclick="abrirModalExcluirUsuario(' + u.id + ')">×</button>' : '<span style="color:var(--muted);font-size:12px;">Protegido</span>') +
+      '</td></tr>').join('') +
+    '</tbody></table>';
+}
+
+function abrirModalUsuario() {
+  document.getElementById('tituloModalUsuario').textContent = 'Cadastrar Usuário';
+  document.getElementById('usuarioId').value = '';
+  document.getElementById('usuarioNome').value = '';
+  document.getElementById('usuarioLogin').value = '';
+  document.getElementById('usuarioSenha').value = '';
+  document.getElementById('usuarioEmail').value = '';
+  document.getElementById('usuarioPerfil').value = 'professor';
+  document.getElementById('modalUsuario').classList.add('show');
+}
+
+function editarUsuario(id) {
+  const u = usuarios.find(x => x.id === id);
+  if (!u) return;
+  document.getElementById('tituloModalUsuario').textContent = 'Editar Usuário';
+  document.getElementById('usuarioId').value = u.id;
+  document.getElementById('usuarioNome').value = u.nome;
+  document.getElementById('usuarioLogin').value = u.login;
+  document.getElementById('usuarioSenha').value = u.senha;
+  document.getElementById('usuarioEmail').value = u.email || '';
+  document.getElementById('usuarioPerfil').value = u.perfil;
+  document.getElementById('modalUsuario').classList.add('show');
+}
+
+function fecharModalUsuario() {
+  document.getElementById('modalUsuario').classList.remove('show');
+}
+
+async function salvarUsuario() {
+  const id = document.getElementById('usuarioId').value;
+  const nome = document.getElementById('usuarioNome').value.trim();
+  const login = document.getElementById('usuarioLogin').value.trim();
+  const senha = document.getElementById('usuarioSenha').value.trim();
+  const email = document.getElementById('usuarioEmail').value.trim() || null;
+  const perfil = document.getElementById('usuarioPerfil').value;
+
+  if (!nome || !login || !senha) { alert('Preencha os campos obrigatórios!'); return; }
+
+  if (id) {
+    await supabase.from('usuarios').update({ nome, login, senha, email, perfil }).eq('id', parseInt(id));
+  } else {
+    const { error } = await supabase.from('usuarios').insert([{ nome, login, senha, email, perfil }]);
+    if (error) { alert('Erro: login já existe!'); return; }
+  }
+
+  fecharModalUsuario();
+  await carregarListaUsuarios();
+  carregarResumo();
+}
+
+// ==========================================
+// EXCLUIR
+// ==========================================
+function abrirModalExcluirAluno(id) {
+  document.getElementById('excluirId').value = id;
+  document.getElementById('excluirTipo').value = 'aluno';
+  document.getElementById('modalExcluir').classList.add('show');
+}
+
+function abrirModalExcluirUsuario(id) {
+  document.getElementById('excluirId').value = id;
+  document.getElementById('excluirTipo').value = 'usuario';
+  document.getElementById('modalExcluir').classList.add('show');
 }
 
 function fecharModalExcluir() {
-  document.getElementById('modalExcluir').classList.remove('ativo');
+  document.getElementById('modalExcluir').classList.remove('show');
 }
 
 async function confirmarExcluir() {
-  const id = parseInt(document.getElementById('modalExcluirId').value);
+  const id = parseInt(document.getElementById('excluirId').value);
+  const tipo = document.getElementById('excluirTipo').value;
 
-  // Primeiro apaga as transações do aluno
-  await supabase.from('transactions').delete().eq('student_id", id);
-
-  // Depois apaga o aluno
-  await supabase.from('students').delete().eq('id', id);
+  if (tipo === 'aluno') {
+    await supabase.from('alunos').delete().eq('id', id);
+  } else {
+    await supabase.from('usuarios').delete().eq('id', id);
+  }
 
   fecharModalExcluir();
-  alert('✅ Aluno excluído!');
-
-  // Recarrega
-  if (usuarioAtual.role === 'professor') {
-    await carregarListaAlunos('listaAlunos');
-    atualizarResumoProfessor();
-  } else {
-    await carregarAreaColaborador();
-  }
+  await carregarTudo();
 }
 
-// ==========================================
-//  ENTER para logar
-// ==========================================
-document.addEventListener('keypress', function(e) {
-  if (e.key === 'Enter' && document.getElementById('telaLogin').classList.contains('ativa')) {
-    fazerLogin();
-  }
+// Enter para logar
+document.getElementById('inpSenha').addEventListener('keypress', e => {
+  if (e.key === 'Enter') entrar();
 });
 </script>
 </body>
