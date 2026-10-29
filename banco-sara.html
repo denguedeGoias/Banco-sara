@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banco Sara — Sistema de Incentivo Estudantil</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#0F1018;
+  --card:#1A1C2B;
+  --text:#F0F2F8;
+  --muted:#8890AA;
+  --gold:#D4AF37;
+  --gold-light:#F0D77C;
+  --gold-border:rgba(212,175,55,.2);
+  --border:rgba(136,144,170,.12);
+  --green:#10B981;
+  --red:#EF4444;
+  --blue:#3B82F6;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Inter',sans-serif;
+  background:radial-gradient(800px 400px at top center, rgba(212,175,55,.06), transparent 60%), var(--bg);
+  min-height:100vh;
+  color:var(--text);
+}
+h1,h2,h3{font-family:'Playfair Display',serif;}
+.container{max-width:1200px;margin:0 auto;padding:20px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;transition:.2s;}
+.card:hover{border-color:var(--gold);transform:translateY(-1px);}
+.btn{border-radius:10px;padding:10px 20px;border:none;font-weight:600;cursor:pointer;transition:.2s;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:6px;}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none !important;}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#000;font-weight:700;}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 16px rgba(212,175,55,.25);}
+.btn-green{background:var(--blue);color:#fff;}
+.btn-red{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-sm{padding:5px 10px;font-size:12px;border-radius:6px;}
+.input{width:100%;padding:12px 14px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:15px;}
+.input:focus{outline:none;border-color:var(--gold);}
+select.input{appearance:none;}
+.badge{display:inline-block;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:600;text-transform:uppercase;}
+.badge-admin{background:rgba(212,175,55,.08);color:var(--gold);border:1px solid var(--gold-border);}
+.badge-professor{background:rgba(59,130,246,.08);color:#60A5FA;border:1px solid rgba(59,130,246,.15);}
+.badge-colaborador{background:rgba(136,144,170,.08);color:var(--muted);border:1px solid rgba(136,144,170,.15);}
+.badge-aluno{background:rgba(16,185,129,.08);color:#34D399;border:1px solid rgba(16,185,129,.15);}
+.badge-demo{background:rgba(245,158,11,.08);color:#F59E0B;border:1px solid rgba(245,158,11,.2);}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
+.mb{margin-bottom:16px;}
+table{width:100%;border-collapse:collapse;margin-top:12px;}
+th{text-align:left;padding:12px 10px;font-size:11px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);}
+td{padding:14px 10px;border-bottom:1px solid var(--border);font-size:14px;}
+tr:hover{background:rgba(212,175,55,.02);}
+.hidden{display:none !important;}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:20px;z-index:100;}
+.modal.show{display:flex;}
+.modal-content{background:var(--card);border:1px solid var(--gold-border);border-radius:20px;padding:28px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;}
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--border);margin-bottom:24px;flex-wrap:wrap;}
+.tab{padding:10px 18px;cursor:pointer;border-bottom:2px solid transparent;font-weight:600;color:var(--muted);transition:.2s;}
+.tab.active{border-bottom-color:var(--gold);color:var(--gold);}
+.section{display:none;}
+.section.active{display:block;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#ef4444;padding:10px 14px;border-radius:8px;margin-bottom:16px;display:none;font-size:14px;}
+.success{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);color:#34D399;padding:10px 14px;border-radius:8px;margin-bottom:16px;display:none;font-size:14px;}
+.flex-between{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+.valor-dourado{color:var(--gold);font-weight:700;font-size:28px;font-family:'Playfair Display',serif;}
+.spinner{width:16px;height:16px;border:2px solid rgba(0,0,0,.2);border-top-color:#000;border-radius:50%;animation:spin .6s linear infinite;display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+label.field-label{font-size:12px;color:var(--muted);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;}
+.field{margin-bottom:14px;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--card);border:1px solid var(--gold-border);color:var(--text);padding:14px 24px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.4);z-index:200;transition:transform .3s ease;font-size:14px;max-width:90%;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.success{border-color:rgba(16,185,129,.4);}
+.toast.error{border-color:rgba(239,68,68,.4);}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty-state .icon{font-size:48px;margin-bottom:12px;opacity:.5;}
+.demo-banner{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#F59E0B;padding:10px 16px;border-radius:10px;margin-bottom:16px;font-size:13px;display:flex;align-items:center;gap:8px;}
+.setup-steps{background:rgba(212,175,55,.04);border:1px solid var(--gold-border);border-radius:12px;padding:20px;margin-top:20px;font-size:13px;color:var(--muted);line-height:1.7;}
+.setup-steps h4{color:var(--gold);margin-bottom:10px;font-family:'Playfair Display',serif;font-size:16px;}
+.setup-steps code{background:rgba(0,0,0,.3);padding:2px 6px;border-radius:4px;color:var(--gold-light);font-size:12px;}
+.setup-steps pre{background:#0a0b12;border:1px solid var(--border);border-radius:8px;padding:14px;overflow-x:auto;margin-top:8px;font-size:11px;line-height:1.5;color:#a8b0c8;}
+@media(max-width:600px){.container{padding:12px;}.modal-content{padding:20px;}.valor-dourado{font-size:22px;}}
+</style>
+</head>
+<body>
+
+<!-- ============ PÁGINA DE LOGIN ============ -->
+<div id="loginPage" class="container" style="display:flex;align-items:center;justify-content:center;min-height:100vh;">
+  <div class="card" style="width:100%;max-width:420px;padding:36px 32px;border-radius:24px;background:linear-gradient(180deg,#1A1C2B 0%,#141622 100%);border:1px solid var(--gold-border);box-shadow:0 8px 40px rgba(0,0,0,.3);">
+    <div style="text-align:center;margin-bottom:36px;">
+      <div style="width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,#D4AF37 0%,#F0D77C 50%,#D4AF37 100%);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 4px 20px rgba(212,175,55,.25);">
+        <span style="font-size:36px;font-weight:bold;color:#000;font-family:'Playfair Display',serif;">S</span>
+      </div>
+      <h2 style="margin:0;color:#fff;font-size:28px;font-weight:700;letter-spacing:3px;">BANCO SARA</h2>
+      <p style="color:var(--muted);margin:8px 0 0;font-size:14px;">Sistema de Incentivo Estudantil</p>
+      <div style="width:60px;height:2px;background:linear-gradient(90deg,transparent,#D4AF37,transparent);margin:16px auto 0;"></div>
+    </div>
+
+    <div id="demoBanner" class="demo-banner hidden">
+      <span>&#9888;&#65039;</span>
+      <span><strong>Modo Demonstração:</strong> conectando localmente. Configure o Supabase para dados persistentes.</span>
+    </div>
+
+    <div id="loginError" class="error"></div>
+    <div id="loginSuccess" class="success"></div>
+
+    <div class="field">
+      <label class="field-label">Usuário</label>
+      <input type="text" id="inpLogin" class="input" placeholder="Digite seu usuário" autocomplete="username">
+    </div>
+    <div class="field" style="margin-bottom:20px;">
+      <label class="field-label">Senha</label>
+      <input type="password" id="inpSenha" class="input" placeholder="Digite sua senha" autocomplete="current-password">
+    </div>
+    <button id="btnEntrar" onclick="entrar()" class="btn btn-primary" style="width:100%;font-size:16px;padding:14px;">ENTRAR</button>
+
+    <div style="text-align:center;margin-top:16px;">
+      <button onclick="mostrarPrimeiroAcesso()" class="btn btn-outline" style="font-size:12px;padding:8px 14px;">Primeiro acesso? Criar administrador</button>
+    </div>
+
+    <!-- PRIMEIRO ACESSO -->
+    <div id="primeiroAcesso" class="hidden" style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
+      <h3 style="color:var(--gold);font-size:18px;margin-bottom:14px;">Criar Conta Administrador</h3>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">Crie a primeira conta de administrador para começar a usar o sistema.</p>
+      <div class="field">
+        <label class="field-label">Seu nome</label>
+        <input type="text" id="adminNome" class="input" placeholder="Nome completo">
+      </div>
+      <div class="field">
+        <label class="field-label">Login de usuário</label>
+        <input type="text" id="adminLogin" class="input" placeholder="Ex: admin">
+      </div>
+      <div class="field" style="margin-bottom:20px;">
+        <label class="field-label">Senha</label>
+        <input type="password" id="adminSenha" class="input" placeholder="Mínimo 4 caracteres">
+      </div>
+      <button onclick="criarAdmin()" class="btn btn-primary" style="width:100%;">Criar Administrador</button>
+      <div style="text-align:center;margin-top:12px;">
+        <button onclick="ocultarPrimeiroAcesso()" class="btn btn-outline" style="font-size:12px;padding:6px 12px;">Voltar ao login</button>
+      </div>
+    </div>
+
+    <!-- INSTRUÇÕES DE CONFIGURAÇÃO -->
+    <div class="setup-steps">
+      <h4>&#128218; Como configurar o banco de dados</h4>
+      <p>1. Crie um projeto grátis em <code>supabase.com</code></p>
+      <p>2. Em <strong>SQL Editor</strong>, execute:</p>
+      <pre>create table alunos (
+  id serial primary key,
+  nome text not null,
+  turma text not null,
+  senha text not null,
+  saldo numeric(10,2) default 0
+);
+create table usuarios (
+  id serial primary key,
+  nome text not null,
+  login text unique not null,
+  senha text not null,
+  email text,
+  perfil text default 'colaborador'
+);
+create table transacoes (
+  id serial primary key,
+  aluno_id int references alunos(id) on delete cascade,
+  valor numeric(10,2) not null,
+  tipo text not null,
+  created_at timestamp default now()
+);</pre>
+      <p style="margin-top:10px;">3. Cole sua <code>URL</code> e <code>anon key</code> no topo do arquivo HTML (variáveis <code>SUPABASE_URL</code> e <code>SUPABASE_KEY</code>).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PÁGINA PRINCIPAL ============ -->
+<div id="mainPage" class="container hidden">
+  <div class="flex-between" style="padding-bottom:16px;border-bottom:1px solid var(--border);margin-bottom:20px;">
+    <div>
+      <h2 style="margin:0;color:var(--gold);font-size:26px;">BANCO SARA</h2>
+      <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span id="nomeUsuario" style="font-weight:600;">Usuário</span>
+        <span id="badgePerfil" class="badge badge-admin">admin</span>
+        <span id="badgeDemo" class="badge badge-demo hidden">modo demo</span>
+      </div>
+    </div>
+    <button onclick="sair()" class="btn btn-outline">Sair</button>
+  </div>
+
+  <div id="barraAbas" class="tabs"></div>
+
+  <!-- MEU SALDO — ALUNO -->
+  <div id="secMeuSaldo" class="section">
+    <div class="card" style="text-align:center;padding:40px 28px;max-width:500px;margin:0 auto;">
+      <p style="color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:2px;">Meu Saldo</p>
+      <p id="meuSaldoValor" class="valor-dourado" style="font-size:56px;margin:20px 0;">R$ 0,00</p>
+      <p id="meuTurma" style="color:var(--muted);font-size:15px;">Turma: —</p>
+      <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
+        <p style="color:var(--muted);font-size:13px;line-height:1.6;">Continue se dedicando! Cada boa atitude, participação e esfor&ccedil;o se converte em incentivos. &#11088;</p>
+      </div>
+      <button onclick="atualizarMeuSaldo()" class="btn btn-outline" style="margin-top:20px;font-size:13px;">Atualizar saldo</button>
+    </div>
+  </div>
+
+  <!-- RESUMO -->
+  <div id="secResumo" class="section">
+    <div class="grid mb">
+      <div class="card">
+        <p style="color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px;">Total de Alunos</p>
+        <p id="qtdAlunos" style="font-size:38px;font-weight:700;margin:10px 0 0;font-family:'Playfair Display',serif;">0</p>
+      </div>
+      <div class="card">
+        <p style="color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px;">Saldo Geral em Circula&ccedil;&atilde;o</p>
+        <p id="saldoGeral" class="valor-dourado" style="margin:10px 0 0;font-size:32px;">R$ 0,00</p>
+      </div>
+      <div class="card">
+        <p style="color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px;">Usu&aacute;rios Ativos</p>
+        <p id="qtdUsuarios" style="font-size:38px;font-weight:700;margin:10px 0 0;font-family:'Playfair Display',serif;">0</p>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;font-size:18px;color:var(--gold);">Como funciona o Banco Sara</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:16px;">
+        <div style="padding:16px;background:rgba(212,175,55,.04);border-radius:10px;border:1px solid var(--gold-border);">
+          <strong style="color:var(--gold);display:block;margin-bottom:6px;">1. Cadastrar</strong>
+          <span style="font-size:13px;color:var(--muted);">Adicione alunos na aba Alunos com nome, turma e senha.</span>
+        </div>
+        <div style="padding:16px;background:rgba(212,175,55,.04);border-radius:10px;border:1px solid var(--gold-border);">
+          <strong style="color:var(--gold);display:block;margin-bottom:6px;">2. Incentivar</strong>
+          <span style="font-size:13px;color:var(--muted);">Use o bot&atilde;o &ldquo;$&rdquo; para adicionar valor por bom comportamento, participa&ccedil;&atilde;o ou desempenho.</span>
+        </div>
+        <div style="padding:16px;background:rgba(212,175,55,.04);border-radius:10px;border:1px solid var(--gold-border);">
+          <strong style="color:var(--gold);display:block;margin-bottom:6px;">3. Resgatar</strong>
+          <span style="font-size:13px;color:var(--muted);">Alunos trocam o saldo por recompensas definidas pela escola. Use o bot&atilde;o &ldquo;$&rdquo; para remover ao resgatar.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALUNOS -->
+  <div id="secAlunos" class="section">
+    <div class="card">
+      <div class="flex-between mb">
+        <h3 style="margin:0;font-size:20px;">Lista de Alunos</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <input type="text" id="buscaAluno" class="input" placeholder="Buscar aluno..." style="width:200px;padding:8px 12px;font-size:13px;" oninput="filtrarAlunos()">
+          <button id="btnNovoAluno" onclick="abrirModalAluno()" class="btn btn-primary">+ Novo Aluno</button>
+        </div>
+      </div>
+      <div id="tabelaAlunos"><div class="empty-state"><div class="icon">&#128260;</div>Carregando...</div></div>
+    </div>
+  </div>
+
+  <!-- GRAFICO -->
+  <div id="secGrafico" class="section">
+    <div class="card">
+      <h3 style="margin-top:0;color:var(--gold);">Distribui&ccedil;&atilde;o de Saldo por Turma</h3>
+      <canvas id="grafico" style="max-height:360px;margin-top:20px;"></canvas>
+    </div>
+  </div>
+
+  <!-- USUARIOS -->
+  <div id="secUsuarios" class="section">
+    <div class="card">
+      <div class="flex-between mb">
+        <h3 style="margin:0;font-size:20px;">Gerenciar Usu&aacute;rios</h3>
+        <button onclick="abrirModalUsuario()" class="btn btn-primary">+ Novo Usu&aacute;rio</button>
+      </div>
+      <div id="tabelaUsuarios"><div class="empty-state"><div class="icon">&#128260;</div>Carregando...</div></div>
+    </div>
+  </div>
+
+  <!-- TRANSACOES -->
+  <div id="secTransacoes" class="section">
+    <div class="card">
+      <div class="flex-between mb">
+        <h3 style="margin:0;font-size:20px;">Hist&oacute;rico de Transa&ccedil;&otilde;es</h3>
+        <button onclick="carregarTransacoes()" class="btn btn-outline btn-sm">Atualizar</button>
+      </div>
+      <div id="tabelaTransacoes"><div class="empty-state"><div class="icon">&#128260;</div>Carregando...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL ALUNO ============ -->
+<div id="modalAluno" class="modal" onclick="if(event.target===this)fecharModalAluno()">
+  <div class="modal-content">
+    <h3 id="tituloModalAluno" style="color:var(--gold);margin-top:0;">Cadastrar Aluno</h3>
+    <input type="hidden" id="alunoId">
+    <div class="field">
+      <label class="field-label">Nome Completo</label>
+      <input type="text" id="alunoNome" class="input" placeholder="Nome do aluno">
+    </div>
+    <div class="field">
+      <label class="field-label">Turma</label>
+      <input type="text" id="alunoTurma" class="input" placeholder="Ex: 1&ordm; Ano A">
+    </div>
+    <div class="field">
+      <label class="field-label">Senha de Acesso</label>
+      <input type="text" id="alunoSenha" class="input" placeholder="Senha para o aluno entrar">
+    </div>
+    <div class="field" style="margin-bottom:20px;">
+      <label class="field-label">Saldo Inicial (R$)</label>
+      <input type="number" id="alunoSaldo" class="input" step="0.01" min="0" placeholder="0.00">
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="fecharModalAluno()" class="btn btn-outline" style="flex:1;">Cancelar</button>
+      <button id="btnSalvarAluno" onclick="salvarAluno()" class="btn btn-primary" style="flex:1;">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL MOVIMENTACAO ============ -->
+<div id="modalMov" class="modal" onclick="if(event.target===this)fecharModalMov()">
+  <div class="modal-content">
+    <h3 style="color:var(--gold);margin-top:0;">Movimentar Saldo</h3>
+    <p id="nomeAlunoMov" style="color:var(--muted);margin-bottom:16px;font-size:14px;">Aluno: —</p>
+    <p id="saldoAtualMov" style="margin-bottom:16px;font-size:14px;">Saldo atual: <strong style="color:var(--gold);">R$ 0,00</strong></p>
+    <input type="hidden" id="movAlunoId">
+    <div class="field">
+      <label class="field-label">Tipo de Movimenta&ccedil;&atilde;o</label>
+      <select id="movTipo" class="input">
+        <option value="adicionar">Adicionar (Incentivo / B&ocirc;nus)</option>
+        <option value="remover">Remover (Resgate / Penalidade)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="field-label">Motivo (opcional)</label>
+      <input type="text" id="movMotivo" class="input" placeholder="Ex: Boa participa&ccedil;&atilde;o, resgate de caderno...">
+    </div>
+    <div class="field" style="margin-bottom:20px;">
+      <label class="field-label">Valor (R$)</label>
+      <input type="number" id="movValor" class="input" step="0.01" min="0.01" placeholder="0.00">
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="fecharModalMov()" class="btn btn-outline" style="flex:1;">Cancelar</button>
+      <button id="btnConfirmarMov" onclick="confirmarMov()" class="btn btn-primary" style="flex:1;">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL USUARIO ============ -->
+<div id="modalUsuario" class="modal" onclick="if(event.target===this)fecharModalUsuario()">
+  <div class="modal-content">
+    <h3 id="tituloModalUsuario" style="color:var(--gold);margin-top:0;">Cadastrar Usu&aacute;rio</h3>
+    <input type="hidden" id="usuarioId">
+    <div class="field">
+      <label class="field-label">Nome Completo</label>
+      <input type="text" id="usuarioNome" class="input" placeholder="Nome completo">
+    </div>
+    <div class="field">
+      <label class="field-label">Login</label>
+      <input type="text" id="usuarioLogin" class="input" placeholder="Nome de usu&aacute;rio">
+    </div>
+    <div class="field">
+      <label class="field-label">Senha</label>
+      <input type="text" id="usuarioSenha" class="input" placeholder="Senha">
+    </div>
+    <div class="field">
+      <label class="field-label">E-mail (opcional)</label>
+      <input type="text" id="usuarioEmail" class="input" placeholder="email@escola.edu">
+    </div>
+    <div class="field" style="margin-bottom:20px;">
+      <label class="field-label">Perfil de Acesso</label>
+      <select id="usuarioPerfil" class="input">
+        <option value="professor">Professor — gerencia alunos e saldos</option>
+        <option value="colaborador">Colaborador — s&oacute; visualiza</option>
+        <option value="aluno">Aluno — v&ecirc; o pr&oacute;prio saldo</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="fecharModalUsuario()" class="btn btn-outline" style="flex:1;">Cancelar</button>
+      <button id="btnSalvarUsuario" onclick="salvarUsuario()" class="btn btn-primary" style="flex:1;">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL EXCLUIR ============ -->
+<div id="modalExcluir" class="modal" onclick="if(event.target===this)fecharModalExcluir()">
+  <div class="modal-content" style="text-align:center;">
+    <div style="font-size:48px;margin-bottom:12px;">&#9888;&#65039;</div>
+    <h3 style="color:var(--red);margin-top:0;">Confirmar Exclus&atilde;o?</h3>
+    <p id="excluirTexto" style="color:var(--muted);margin-top:8px;">Esta a&ccedil;&atilde;o n&atilde;o pode ser desfeita.</p>
+    <input type="hidden" id="excluirId">
+    <input type="hidden" id="excluirTipo">
+    <div style="display:flex;gap:10px;margin-top:24px;">
+      <button onclick="fecharModalExcluir()" class="btn btn-outline" style="flex:1;">Cancelar</button>
+      <button id="btnConfirmarExcluir" onclick="confirmarExcluir()" class="btn btn-red" style="flex:1;">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ==========================================
+// CONFIGURACAO SUPABASE
+// ==========================================
+const SUPABASE_URL = "https://riizbppmwhkntotukbga.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpaXpicHBtd2hrbnRvdHVrYmdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3MjkzNjcsImV4cCI6MjEwMzMwNTM2N30.3ATHYOmxFcujbKoAAgezzMBL9qr7JKY_49gXevHAh58";
+
+let supabase = null;
+let MODO_DEMO = false;
+let usuarioLogado = null;
+let alunos = [];
+let usuarios = [];
+let transacoes = [];
+let grafico = null;
+let filtroBusca = '';
+
+// ==========================================
+// INICIALIZACAO — tenta conectar no Supabase,
+// se falhar usa modo demo (localStorage)
+// ==========================================
+async function inicializar() {
+  try {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Teste de conexao rapido
+    const { error } = await supabase.from('usuarios').select('id', { count: 'exact', head: true }).timeout(5000);
+    if (error && error.message && error.message.includes('Failed to fetch')) throw new Error('offline');
+    MODO_DEMO = false;
+  } catch (e) {
+    MODO_DEMO = true;
+    document.getElementById('demoBanner').classList.remove('hidden');
+    console.warn('Supabase indisponivel — usando modo demo (localStorage)');
+  }
+  // Restaura sessao
+  const salvo = localStorage.getItem('sara_usuario');
+  if (salvo) {
+    try {
+      usuarioLogado = JSON.parse(salvo);
+      carregarPagina();
+    } catch(e) { localStorage.removeItem('sara_usuario'); }
+  }
+}
+
+// ==========================================
+// CAMADA DE DADOS — abstrai Supabase vs Demo
+// ==========================================
+function demoGet(tabela) {
+  return JSON.parse(localStorage.getItem('sara_' + tabela) || '[]');
+}
+function demoSet(tabela, dados) {
+  localStorage.setItem('sara_' + tabela, JSON.stringify(dados));
+}
+function demoProximoId(tabela) {
+  const dados = demoGet(tabela);
+  return dados.length ? Math.max(...dados.map(d => d.id)) + 1 : 1;
+}
+
+const db = {
+  async select(tabela, filtro) {
+    if (MODO_DEMO) {
+      let dados = demoGet(tabela);
+      if (filtro) for (const k in filtro) dados = dados.filter(d => d[k] === filtro[k]);
+      return { data: dados, error: null };
+    }
+    let q = supabase.from(tabela).select('*');
+    if (filtro) for (const k in filtro) q = q.eq(k, filtro[k]);
+    return await q;
+  },
+  async insert(tabela, linha) {
+    if (MODO_DEMO) {
+      const dados = demoGet(tabela);
+      const nova = { id: demoProximoId(tabela), ...linha };
+      dados.push(nova);
+      demoSet(tabela, dados);
+      return { data: [nova], error: null };
+    }
+    return await supabase.from(tabela).insert([linha]).select();
+  },
+  async update(tabela, id, campos) {
+    if (MODO_DEMO) {
+      const dados = demoGet(tabela);
+      const i = dados.findIndex(d => d.id === id);
+      if (i >= 0) { dados[i] = { ...dados[i], ...campos }; demoSet(tabela, dados); }
+      return { data: i >= 0 ? [dados[i]] : null, error: null };
+    }
+    return await supabase.from(tabela).update(campos).eq('id', id).select();
+  },
+  async delete(tabela, id) {
+    if (MODO_DEMO) {
+      demoSet(tabela, demoGet(tabela).filter(d => d.id !== id));
+      return { data: null, error: null };
+    }
+    return await supabase.from(tabela).delete().eq('id', id);
+  },
+  async count(tabela) {
+    if (MODO_DEMO) return { count: demoGet(tabela).length, error: null };
+    return await supabase.from(tabela).select('*', { count: 'exact', head: true });
+  }
+};
+
+// ==========================================
+// UTILITARIOS
+// ==========================================
+function formatarDinheiro(v) {
+  return "R$ " + parseFloat(v || 0).toFixed(2).replace('.', ',');
+}
+function escapar(str) {
+  const div = document.createElement('div');
+  div.textContent = str == null ? '' : String(str);
+  return div.innerHTML;
+}
+function toast(msg, tipo) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + (tipo || '');
+  setTimeout(() => el.classList.remove('show'), 3500);
+}
+function btnLoading(id, carregando, textoOriginal) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  if (carregando) {
+    btn.dataset.original = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Aguarde...';
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = btn.dataset.original || textoOriginal || 'Salvar';
+  }
+}
+
+// ==========================================
+// LOGIN
+// ==========================================
+async function entrar() {
+  const login = document.getElementById('inpLogin').value.trim();
+  const senha = document.getElementById('inpSenha').value;
+  if (!login || !senha) { toast('Preencha usuário e senha!', 'error'); return; }
+
+  btnLoading('btnEntrar', true);
+
+  // Busca em usuarios (admin/professor/colaborador)
+  let { data } = await db.select('usuarios', { login, senha });
+  let user = data && data[0];
+
+  if (!user) {
+    // Busca em alunos (login = nome)
+    const { data: alunoData } = await db.select('alunos', { nome: login, senha });
+    if (alunoData && alunoData[0]) {
+      const a = alunoData[0];
+      user = { id: a.id, nome: a.nome, perfil: 'aluno', turma: a.turma, saldo: a.saldo, _aluno: true };
+    }
+  }
+
+  btnLoading('btnEntrar', false, 'ENTRAR');
+
+  if (!user) { toast('Usuário ou senha incorretos!', 'error'); return; }
+
+  usuarioLogado = user;
+  localStorage.setItem('sara_usuario', JSON.stringify(user));
+  carregarPagina();
+}
+
+function sair() {
+  usuarioLogado = null;
+  localStorage.removeItem('sara_usuario');
+  document.getElementById('loginPage').classList.remove('hidden');
+  document.getElementById('mainPage').classList.add('hidden');
+  document.getElementById('inpLogin').value = '';
+  document.getElementById('inpSenha').value = '';
+}
+
+function mostrarPrimeiroAcesso() {
+  document.getElementById('primeiroAcesso').classList.remove('hidden');
+  document.getElementById('loginError').style.display = 'none';
+}
+function ocultarPrimeiroAcesso() {
+  document.getElementById('primeiroAcesso').classList.add('hidden');
+}
+
+async function criarAdmin() {
+  const nome = document.getElementById('adminNome').value.trim();
+  const login = document.getElementById('adminLogin').value.trim();
+  const senha = document.getElementById('adminSenha').value;
+  if (!nome || !login || !senha) { toast('Preencha todos os campos!', 'error'); return; }
+  if (senha.length < 4) { toast('A senha deve ter ao menos 4 caracteres.', 'error'); return; }
+
+  // Verifica se ja existe admin
+  const { data: existentes } = await db.select('usuarios', { perfil: 'admin' });
+  if (existentes && existentes.length > 0) { toast('Já existe um administrador. Faça login.', 'error'); ocultarPrimeiroAcesso(); return; }
+
+  const { error } = await db.insert('usuarios', { nome, login, senha, email: null, perfil: 'admin' });
+  if (error) { toast('Erro: login já existe ou banco indisponível.', 'error'); return; }
+
+  toast('Administrador criado com sucesso! Faça login.', 'success');
+  document.getElementById('inpLogin').value = login;
+  ocultarPrimeiroAcesso();
+}
+
+// ==========================================
+// MONTAR INTERFACE
+// ==========================================
+function carregarPagina() {
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('mainPage').classList.remove('hidden');
+
+  document.getElementById('nomeUsuario').textContent = usuarioLogado.nome;
+  const badge = document.getElementById('badgePerfil');
+  badge.textContent = usuarioLogado.perfil;
+  badge.className = 'badge badge-' + usuarioLogado.perfil;
+  document.getElementById('badgeDemo').classList.toggle('hidden', !MODO_DEMO);
+
+  const abas = document.getElementById('barraAbas');
+  abas.innerHTML = '';
+  const secoes = [];
+
+  if (usuarioLogado.perfil === 'aluno') {
+    secoes.push({ id: 'secMeuSaldo', nome: 'Meu Saldo' });
+  } else {
+    secoes.push({ id: 'secResumo', nome: 'Resumo' });
+    secoes.push({ id: 'secAlunos', nome: 'Alunos' });
+    secoes.push({ id: 'secTransacoes', nome: 'Transações' });
+    secoes.push({ id: 'secGrafico', nome: 'Gráfico' });
+    if (usuarioLogado.perfil === 'admin') {
+      secoes.push({ id: 'secUsuarios', nome: 'Usuários' });
+    }
+  }
+
+  secoes.forEach((aba, i) => {
+    const el = document.createElement('div');
+    el.className = 'tab' + (i === 0 ? ' active' : '');
+    el.textContent = aba.nome;
+    el.onclick = () => abrirSecao(aba.id, el);
+    abas.appendChild(el);
+  });
+
+  const btnNovoAluno = document.getElementById('btnNovoAluno');
+  btnNovoAluno.style.display = usuarioLogado.perfil === 'colaborador' ? 'none' : 'inline-flex';
+
+  abrirSecao(secoes[0].id, abas.firstChild);
+
+  if (usuarioLogado.perfil === 'aluno') {
+    atualizarMeuSaldo();
+  } else {
+    carregarTudo();
+  }
+}
+
+function abrirSecao(id, abaEl) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (abaEl) abaEl.classList.add('active');
+  if (id === 'secGrafico') desenharGrafico();
+  if (id === 'secTransacoes') carregarTransacoes();
+}
+
+async function carregarTudo() {
+  await Promise.all([carregarResumo(), carregarListaAlunos()]);
+  if (usuarioLogado.perfil === 'admin') carregarListaUsuarios();
+}
+
+async function atualizarMeuSaldo() {
+  if (!usuarioLogado._aluno) return;
+  const { data } = await db.select('alunos', { id: usuarioLogado.id });
+  if (data && data[0]) {
+    usuarioLogado.saldo = data[0].saldo;
+    usuarioLogado.turma = data[0].turma;
+    localStorage.setItem('sara_usuario', JSON.stringify(usuarioLogado));
+  }
+  document.getElementById('meuSaldoValor').textContent = formatarDinheiro(usuarioLogado.saldo);
+  document.getElementById('meuTurma').textContent = 'Turma: ' + (usuarioLogado.turma || '—');
+}
+
+// ==========================================
+// RESUMO
+// ==========================================
+async function carregarResumo() {
+  const { data: listaAlunos } = await db.select('alunos');
+  const { count } = await db.count('usuarios');
+  const total = listaAlunos ? listaAlunos.reduce((s, a) => s + parseFloat(a.saldo || 0), 0) : 0;
+  document.getElementById('qtdAlunos').textContent = listaAlunos ? listaAlunos.length : 0;
+  document.getElementById('saldoGeral').textContent = formatarDinheiro(total);
+  document.getElementById('qtdUsuarios').textContent = count || 0;
+}
+
+// ==========================================
+// LISTA DE ALUNOS
+// ==========================================
+async function carregarListaAlunos() {
+  const { data, error } = await db.select('alunos');
+  alunos = data || [];
+  renderizarAlunos();
+}
+
+function filtrarAlunos() {
+  filtroBusca = document.getElementById('buscaAluno').value.toLowerCase();
+  renderizarAlunos();
+}
+
+function renderizarAlunos() {
+  const el = document.getElementById('tabelaAlunos');
+  const lista = filtroBusca
+    ? alunos.filter(a => (a.nome || '').toLowerCase().includes(filtroBusca) || (a.turma || '').toLowerCase().includes(filtroBusca))
+    : alunos;
+
+  if (!lista.length) {
+    el.innerHTML = '<div class="empty-state"><div class="icon">&#128104;&#8205;&#127979;</div>' +
+      (alunos.length ? 'Nenhum aluno encontrado na busca.' : 'Nenhum aluno cadastrado ainda. Clique em "+ Novo Aluno" para começar.') +
+      '</div>';
+    return;
+  }
+
+  const podeEditar = usuarioLogado.perfil !== 'colaborador';
+
+  let html = '<div style="overflow-x:auto;"><table><thead><tr><th>Nome</th><th>Turma</th><th>Saldo</th>' +
+    (podeEditar ? '<th style="text-align:right;">Ações</th>' : '') + '</tr></thead><tbody>';
+
+  lista.forEach(a => {
+    html += '<tr>' +
+      '<td><strong>' + escapar(a.nome) + '</strong></td>' +
+      '<td>' + escapar(a.turma) + '</td>' +
+      '<td style="color:var(--gold);font-weight:600;">' + formatarDinheiro(a.saldo) + '</td>';
+    if (podeEditar) {
+      html += '<td style="text-align:right;white-space:nowrap;">' +
+        '<button class="btn btn-green btn-sm" style="margin-right:4px;" title="Movimentar saldo" onclick="abrirModalMov(' + a.id + ')">$</button>' +
+        '<button class="btn btn-outline btn-sm" style="margin-right:4px;" title="Editar" onclick="editarAluno(' + a.id + ')">Editar</button>' +
+        '<button class="btn btn-red btn-sm" title="Excluir" onclick="abrirModalExcluirAluno(' + a.id + ',\'' + escapar(a.nome).replace(/'/g, "\\'") + '\')">×</button>' +
+        '</td>';
+    }
+    html += '</tr>';
+  });
+
+  html += '</tbody></table></div>';
+  el.innerHTML = html;
+}
+
+// ==========================================
+// TRANSACOES
+// ==========================================
+async function carregarTransacoes() {
+  const el = document.getElementById('tabelaTransacoes');
+  const { data } = await db.select('transacoes');
+  let lista = data || [];
+  // Garante que alunos estejam carregados para mostrar nome
+  if (!alunos.length) { const r = await db.select('alunos'); alunos = r.data || []; }
+
+  if (!lista.length) {
+    el.innerHTML = '<div class="empty-state"><div class="icon">&#128203;</div>Nenhuma transação registrada ainda.</div>';
+    return;
+  }
+
+  // Ordena por mais recente (demo usa id decrescente; supabase usa created_at)
+  lista.sort((a, b) => (b.created_at || b.id) - (a.created_at || a.id));
+  if (lista.length > 50) lista = lista.slice(0, 50);
+
+  const nomeAluno = id => { const a = alunos.find(x => x.id === id); return a ? escapar(a.nome) : 'Aluno #' + id; };
+
+  let html = '<div style="overflow-x:auto;"><table><thead><tr><th>Data</th><th>Aluno</th><th>Tipo</th><th>Valor</th><th>Motivo</th></tr></thead><tbody>';
+  lista.forEach(t => {
+    const dataStr = t.created_at ? new Date(t.created_at).toLocaleString('pt-BR') : '—';
+    const tipoTag = t.tipo === 'adicionar'
+      ? '<span style="color:var(--green);font-weight:600;">+ Adicionar</span>'
+      : '<span style="color:var(--red);font-weight:600;">− Remover</span>';
+    html += '<tr>' +
+      '<td style="font-size:12px;color:var(--muted);">' + dataStr + '</td>' +
+      '<td>' + nomeAluno(t.aluno_id) + '</td>' +
+      '<td>' + tipoTag + '</td>' +
+      '<td style="font-weight:600;">' + formatarDinheiro(t.valor) + '</td>' +
+      '<td style="color:var(--muted);font-size:13px;">' + escapar(t.motivo || '—') + '</td>' +
+      '</tr>';
+  });
+  html += '</tbody></table></div>';
+  el.innerHTML = html;
+}
+
+// ==========================================
+// GRAFICO
+// ==========================================
+async function desenharGrafico() {
+  const { data } = await db.select('alunos');
+  if (!data || !data.length) {
+    const ctx = document.getElementById('grafico');
+    if (grafico) { grafico.destroy(); grafico = null; }
+    ctx.parentElement.querySelector('.empty-chart')?.remove();
+    const div = document.createElement('div');
+    div.className = 'empty-state empty-chart';
+    div.innerHTML = '<div class="icon">&#128202;</div>Cadastre alunos para ver o gráfico.';
+    ctx.parentElement.appendChild(div);
+    ctx.style.display = 'none';
+    return;
+  }
+  document.getElementById('grafico').style.display = 'block';
+
+  const porTurma = {};
+  data.forEach(a => {
+    const turma = a.turma || 'Sem turma';
+    if (!porTurma[turma]) porTurma[turma] = 0;
+    porTurma[turma] += parseFloat(a.saldo || 0);
+  });
+
+  const ctx = document.getElementById('grafico').getContext('2d');
+  if (grafico) grafico.destroy();
+
+  const labels = Object.keys(porTurma);
+  const valores = Object.values(porTurma);
+  const cores = labels.map((_, i) => `hsl(${45 + i * 12}, 70%, ${55 + (i % 3) * 5}%)`);
+
+  grafico = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Saldo por Turma (R$)',
+        data: valores,
+        backgroundColor: cores,
+        borderRadius: 8,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => ' ' + formatarDinheiro(c.parsed.y) } }
+      },
+      scales: {
+        y: { ticks: { color: '#8890AA', callback: v => 'R$' + v }, grid: { color: 'rgba(136,144,170,.08)' } },
+        x: { ticks: { color: '#8890AA' }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+// ==========================================
+// CRUD ALUNO
+// ==========================================
+function abrirModalAluno() {
+  document.getElementById('tituloModalAluno').textContent = 'Cadastrar Aluno';
+  document.getElementById('alunoId').value = '';
+  document.getElementById('alunoNome').value = '';
+  document.getElementById('alunoTurma').value = '';
+  document.getElementById('alunoSenha').value = '';
+  document.getElementById('alunoSaldo').value = '';
+  document.getElementById('modalAluno').classList.add('show');
+  setTimeout(() => document.getElementById('alunoNome').focus(), 100);
+}
+
+function editarAluno(id) {
+  const a = alunos.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('tituloModalAluno').textContent = 'Editar Aluno';
+  document.getElementById('alunoId').value = id;
+  document.getElementById('alunoNome').value = a.nome;
+  document.getElementById('alunoTurma').value = a.turma;
+  document.getElementById('alunoSenha').value = a.senha;
+  document.getElementById('alunoSaldo').value = a.saldo;
+  document.getElementById('modalAluno').classList.add('show');
+}
+
+function fecharModalAluno() { document.getElementById('modalAluno').classList.remove('show'); }
+
+async function salvarAluno() {
+  const id = document.getElementById('alunoId').value;
+  const nome = document.getElementById('alunoNome').value.trim();
+  const turma = document.getElementById('alunoTurma').value.trim();
+  const senha = document.getElementById('alunoSenha').value.trim();
+  const saldo = parseFloat(document.getElementById('alunoSaldo').value) || 0;
+
+  if (!nome || !turma || !senha) { toast('Preencha nome, turma e senha!', 'error'); return; }
+
+  btnLoading('btnSalvarAluno', true);
+  if (id) {
+    await db.update('alunos', parseInt(id), { nome, turma, senha, saldo });
+    toast('Aluno atualizado!', 'success');
+  } else {
+    const { error } = await db.insert('alunos', { nome, turma, senha, saldo });
+    if (error) { toast('Erro ao cadastrar aluno.', 'error'); btnLoading('btnSalvarAluno', false); return; }
+    toast('Aluno cadastrado com sucesso!', 'success');
+  }
+  btnLoading('btnSalvarAluno', false);
+  fecharModalAluno();
+  await carregarTudo();
+}
+
+// ==========================================
+// MOVIMENTACAO
+// ==========================================
+async function abrirModalMov(id) {
+  const a = alunos.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('movAlunoId').value = id;
+  document.getElementById('nomeAlunoMov').textContent = 'Aluno: ' + a.nome;
+  document.getElementById('saldoAtualMov').innerHTML = 'Saldo atual: <strong style="color:var(--gold);">' + formatarDinheiro(a.saldo) + '</strong>';
+  document.getElementById('movValor').value = '';
+  document.getElementById('movMotivo').value = '';
+  document.getElementById('movTipo').value = 'adicionar';
+  document.getElementById('modalMov').classList.add('show');
+  setTimeout(() => document.getElementById('movValor').focus(), 100);
+}
+
+function fecharModalMov() { document.getElementById('modalMov').classList.remove('show'); }
+
+async function confirmarMov() {
+  const id = parseInt(document.getElementById('movAlunoId').value);
+  const tipo = document.getElementById('movTipo').value;
+  const valor = parseFloat(document.getElementById('movValor').value);
+  const motivo = document.getElementById('movMotivo').value.trim();
+
+  if (!valor || valor <= 0) { toast('Digite um valor válido!', 'error'); return; }
+
+  const a = alunos.find(x => x.id === id);
+  if (!a) return;
+
+  let novoSaldo = parseFloat(a.saldo || 0);
+  if (tipo === 'adicionar') {
+    novoSaldo += valor;
+  } else {
+    if (valor > novoSaldo) { toast('Saldo insuficiente para remover!', 'error'); return; }
+    novoSaldo -= valor;
+  }
+
+  btnLoading('btnConfirmarMov', true);
+  await db.update('alunos', id, { saldo: novoSaldo });
+  await db.insert('transacoes', {
+    aluno_id: id,
+    valor,
+    tipo,
+    motivo: motivo || null,
+    created_at: new Date().toISOString()
+  });
+  btnLoading('btnConfirmarMov', false);
+
+  fecharModalMov();
+  toast(tipo === 'adicionar' ? 'Valor adicionado com sucesso!' : 'Valor removido com sucesso!', 'success');
+  await carregarTudo();
+}
+
+// ==========================================
+// USUARIOS
+// ==========================================
+async function carregarListaUsuarios() {
+  const { data, error } = await db.select('usuarios');
+  usuarios = data || [];
+  const el = document.getElementById('tabelaUsuarios');
+
+  if (!usuarios.length) {
+    el.innerHTML = '<div class="empty-state"><div class="icon">&#128100;</div>Nenhum usuário cadastrado.</div>';
+    return;
+  }
+
+  let html = '<div style="overflow-x:auto;"><table><thead><tr><th>Nome</th><th>Login</th><th>Perfil</th><th>E-mail</th><th style="text-align:right;">Ações</th></tr></thead><tbody>';
+  usuarios.forEach(u => {
+    const ehAdminProtegido = u.perfil === 'admin';
+    html += '<tr>' +
+      '<td><strong>' + escapar(u.nome) + '</strong>' + (ehAdminProtegido ? ' <small style="color:var(--gold)">(principal)</small>' : '') + '</td>' +
+      '<td>' + escapar(u.login) + '</td>' +
+      '<td><span class="badge badge-' + u.perfil + '">' + u.perfil + '</span></td>' +
+      '<td style="color:var(--muted);font-size:13px;">' + escapar(u.email || '—') + '</td>' +
+      '<td style="text-align:right;white-space:nowrap;">';
+    if (!ehAdminProtegido) {
+      html += '<button class="btn btn-outline btn-sm" style="margin-right:4px;" onclick="editarUsuario(' + u.id + ')">Editar</button>' +
+        '<button class="btn btn-red btn-sm" onclick="abrirModalExcluirUsuario(' + u.id + ',\'' + escapar(u.nome).replace(/'/g, "\\'") + '\')">×</button>';
+    } else {
+      html += '<span style="color:var(--muted);font-size:12px;">Protegido</span>';
+    }
+    html += '</td></tr>';
+  });
+  html += '</tbody></table></div>';
+  el.innerHTML = html;
+}
+
+function abrirModalUsuario() {
+  document.getElementById('tituloModalUsuario').textContent = 'Cadastrar Usuário';
+  document.getElementById('usuarioId').value = '';
+  document.getElementById('usuarioNome').value = '';
+  document.getElementById('usuarioLogin').value = '';
+  document.getElementById('usuarioSenha').value = '';
+  document.getElementById('usuarioEmail').value = '';
+  document.getElementById('usuarioPerfil').value = 'professor';
+  document.getElementById('modalUsuario').classList.add('show');
+}
+
+function editarUsuario(id) {
+  const u = usuarios.find(x => x.id === id);
+  if (!u) return;
+  document.getElementById('tituloModalUsuario').textContent = 'Editar Usuário';
+  document.getElementById('usuarioId').value = u.id;
+  document.getElementById('usuarioNome').value = u.nome;
+  document.getElementById('usuarioLogin').value = u.login;
+  document.getElementById('usuarioSenha').value = u.senha;
+  document.getElementById('usuarioEmail').value = u.email || '';
+  document.getElementById('usuarioPerfil').value = u.perfil;
+  document.getElementById('modalUsuario').classList.add('show');
+}
+
+function fecharModalUsuario() { document.getElementById('modalUsuario').classList.remove('show'); }
+
+async function salvarUsuario() {
+  const id = document.getElementById('usuarioId').value;
+  const nome = document.getElementById('usuarioNome').value.trim();
+  const login = document.getElementById('usuarioLogin').value.trim();
+  const senha = document.getElementById('usuarioSenha').value.trim();
+  const email = document.getElementById('usuarioEmail').value.trim() || null;
+  const perfil = document.getElementById('usuarioPerfil').value;
+
+  if (!nome || !login || !senha) { toast('Preencha nome, login e senha!', 'error'); return; }
+
+  btnLoading('btnSalvarUsuario', true);
+  if (id) {
+    await db.update('usuarios', parseInt(id), { nome, login, senha, email, perfil });
+    toast('Usuário atualizado!', 'success');
+  } else {
+    // Verifica login duplicado
+    const { data: existente } = await db.select('usuarios', { login });
+    if (existente && existente.length) { toast('Erro: este login já existe!', 'error'); btnLoading('btnSalvarUsuario', false); return; }
+    await db.insert('usuarios', { nome, login, senha, email, perfil });
+    toast('Usuário cadastrado!', 'success');
+  }
+  btnLoading('btnSalvarUsuario', false);
+  fecharModalUsuario();
+  await carregarListaUsuarios();
+  carregarResumo();
+}
+
+// ==========================================
+// EXCLUIR
+// ==========================================
+function abrirModalExcluirAluno(id, nome) {
+  document.getElementById('excluirId').value = id;
+  document.getElementById('excluirTipo').value = 'aluno';
+  document.getElementById('excluirTexto').textContent = 'O aluno "' + nome + '" e todas as suas transações serão removidos permanentemente.';
+  document.getElementById('modalExcluir').classList.add('show');
+}
+
+function abrirModalExcluirUsuario(id, nome) {
+  document.getElementById('excluirId').value = id;
+  document.getElementById('excluirTipo').value = 'usuario';
+  document.getElementById('excluirTexto').textContent = 'O usuário "' + nome + '" será removido permanentemente.';
+  document.getElementById('modalExcluir').classList.add('show');
+}
+
+function fecharModalExcluir() { document.getElementById('modalExcluir').classList.remove('show'); }
+
+async function confirmarExcluir() {
+  const id = parseInt(document.getElementById('excluirId').value);
+  const tipo = document.getElementById('excluirTipo').value;
+  btnLoading('btnConfirmarExcluir', true);
+  await db.delete(tipo === 'aluno' ? 'alunos' : 'usuarios', id);
+  btnLoading('btnConfirmarExcluir', false);
+  fecharModalExcluir();
+  toast(tipo === 'aluno' ? 'Aluno excluído.' : 'Usuário excluído.', 'success');
+  await carregarTudo();
+}
+
+// ==========================================
+// EVENTOS
+// ==========================================
+document.getElementById('inpSenha').addEventListener('keypress', e => { if (e.key === 'Enter') entrar(); });
+document.getElementById('inpLogin').addEventListener('keypress', e => { if (e.key === 'Enter') document.getElementById('inpSenha').focus(); });
+
+// Inicia
+inicializar();
+</script>
+</body>
+</html>
